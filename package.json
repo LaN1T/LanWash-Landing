@@ -7,7 +7,7 @@
     "dev": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "build:pages": "tsc --noEmit && vite build --base=/LanWash-Site/",
+    "build:pages": "tsc --noEmit && vite build --base=/LanWash-Landing/",
     "build:clients": "tsc --noEmit && vite build --mode clients --outDir dist/clients",
     "build:business": "tsc --noEmit && vite build --mode business --outDir dist/business",
     "build:subdomains": "tsc --noEmit && vite build --mode clients --outDir dist/clients && vite build --mode business --outDir dist/business"

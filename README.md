@@ -1,8 +1,11 @@
 # LanWash Site
 
-Репозиторий: https://github.com/mixelka75/LanWash-Site
+Репозиторий: https://github.com/LaN1T/LanWash-Landing
 
-GitHub Pages: https://mixelka75.github.io/LanWash-Site/
+Лендинги на GitHub Pages:
+
+- **Клиентская версия:** https://lan1t.github.io/LanWash-Landing/
+- **Бизнес-версия:** https://lan1t.github.io/LanWash-Landing/?audience=business
 
 Отдельный адаптивный лендинг LanWash на React + TypeScript + Vite. Фирменный логотип, локальный Manrope и реальные экраны Android-демо включены в репозиторий.
 
@@ -37,19 +40,17 @@ pnpm preview
 - Ссылки верхнего меню имеют область нажатия не менее 48 px по высоте; мобильное меню используется до 960 px.
 - Доступные подписи, клавиатурная навигация, Escape/ловушка фокуса в диалогах, поддержка reduced motion.
 
-## Две версии и будущие поддомены
+## Две версии
 
-Имена поддоменов пользователь пока отложил. DNS и хостинг отдельных поддоменов не настроены; публикация текущей версии на GitHub Pages запускается после push в `main`.
+Переключение версий — через параметр `?audience=clients` / `?audience=business`. На GitHub Pages опубликован единый сайт: клиентская версия открывается по умолчанию, бизнес-версия — по `?audience=business`.
 
-Локальное превью: клиентская версия — `/`, бизнес — `/?audience=business`. На текущем GitHub Pages работает тот же способ переключения после отдельной публикации. Пока адреса не заданы, ссылки меняют `audience` на том же сайте.
-
-Для двух независимых статических сайтов:
+Для локальной сборки двух независимых статических сайтов (например, под будущие поддомены):
 
 ```bash
 pnpm build:subdomains
 ```
 
-Результат: `dist/clients/` и `dist/business/`. Каждый каталог размещается в корне своего поддомена. Аудитория и метаданные страницы заданы при сборке; клиентская версия открывается по умолчанию.
+Результат: `dist/clients/` и `dist/business/`. Аудитория и метаданные страницы заданы при сборке; клиентская версия открывается по умолчанию.
 
 Перед сборкой укажите в `.env.local` выбранные адреса:
 
@@ -58,7 +59,7 @@ VITE_CLIENT_SITE_URL=https://<клиентский-поддомен>
 VITE_BUSINESS_SITE_URL=https://<бизнес-поддомен>
 ```
 
-Параметр `?audience=clients` / `?audience=business` позволяет проверить обе версии локально. Для индивидуальной сборки есть `pnpm build:clients` и `pnpm build:business`.
+Для индивидуальной сборки есть `pnpm build:clients` и `pnpm build:business`.
 
 ## Заглушки
 
@@ -87,13 +88,13 @@ Android-репозиторий: https://github.com/mixelka75/LanWash-Android. В
 
 ## GitHub Pages
 
-Публикация настроена через `.github/workflows/pages.yml`: после push в `main` устанавливаются зависимости из lockfile, выполняется сборка и публикуется `dist/`.
+Публикация настроена через `.github/workflows/pages.yml`: после push в `main` устанавливаются зависимости из lockfile, выполняется сборка `pnpm build:pages` и публикуется `dist/`.
 
 ```bash
 pnpm build:pages
-pnpm preview --base=/LanWash-Site/
+pnpm preview --base=/LanWash-Landing/
 ```
 
-Для этой сборки локальный адрес: `http://127.0.0.1:4173/LanWash-Site/`. Параметр Vite `--base=/LanWash-Site/` обеспечивает корректные пути к JS, CSS, изображениям и шрифтам. Обычные `pnpm dev` / `pnpm build` по-прежнему работают в корне для локальной разработки.
+Для этой сборки локальный адрес: `http://127.0.0.1:4173/LanWash-Landing/`. Параметр Vite `--base=/LanWash-Landing/` обеспечивает корректные пути к JS, CSS, изображениям и шрифтам. Обычные `pnpm dev` / `pnpm build` по-прежнему работают в корне для локальной разработки.
 
 Публикуется только статический сайт. Контакты/APK остаются заглушками, форма не отправляет заявки.
