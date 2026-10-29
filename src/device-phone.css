@@ -1,0 +1,160 @@
+/*
+ * Samsung Galaxy A17: корпус 164,4 × 77,9 × 7,5 мм, экран 6,7" 1080 × 2340 (19,5 : 9).
+ * Размер задаёт ширина родителя; все отступы — в процентах ширины, поэтому пропорции сохраняются.
+ */
+.device {
+  display: block;
+  width: 100%;
+  perspective: 1600px;
+  /* Тень от корпуса: близкая мягкая и дальняя рассеянная, смещены в сторону наклона. */
+  filter: drop-shadow(14px 18px 14px rgb(17 24 39 / 0.14))
+    drop-shadow(30px 44px 40px rgb(17 24 39 / 0.12));
+}
+
+/* Рамка: светлый матовый металл без бликов. Радиус угла ~10 мм. */
+.device-body {
+  position: relative;
+  display: block;
+  padding: 1.15%;
+  border-radius: 12.8% / 6.1%;
+  background: linear-gradient(140deg, #f1f3f5 0%, #d7dbe0 36%, #e9ecef 64%, #c6cbd1 100%);
+  box-shadow:
+    inset 0 0 0 1px rgb(20 28 38 / 0.08),
+    inset 0 1px 0 rgb(255 255 255 / 0.85);
+  transform-style: preserve-3d;
+  transition: transform 0.35s ease;
+}
+
+/* Стекло: поля 3,3 мм по бокам и сверху, нижнее чуть шире. */
+.device-glass {
+  position: relative;
+  display: block;
+  padding: 4.4% 3.1% 6.2%;
+  border-radius: 12% / 5.6%;
+  background: #0b0c0e;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.05);
+}
+
+.device-screen {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 720 / 1560;
+  border-radius: 9% / 4.15%;
+  /* Пока скриншот загружается (loading="lazy"), экран светлый, а не чёрная плашка. */
+  background: #eef1f4;
+}
+.device-screen img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Снимок 20 : 9 обрезается снизу — там только полоса жестов. */
+  object-position: top;
+}
+
+/* Вырез Infinity-U: каплевидный, по центру верхней кромки, всегда поверх скриншота. */
+.device-notch {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 9.5%;
+  height: auto;
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+/* Торец толщиной 7,5 мм: прямой участок между скруглениями углов, развёрнут на 90° за экран. */
+.device-edge {
+  position: absolute;
+  top: 6.1%;
+  bottom: 6.1%;
+  width: 10.4%;
+  background: linear-gradient(
+    90deg,
+    #9aa1a9 0%,
+    #c3c8ce 24%,
+    #d4d8dd 50%,
+    #c0c5cb 76%,
+    #959ca5 100%
+  );
+  border-radius: 4px;
+}
+.device-tilt-left .device-body {
+  transform: rotateY(-17deg) rotateX(3deg) rotateZ(-1deg);
+}
+.device-tilt-left .device-edge {
+  right: 0;
+  transform-origin: right center;
+  transform: rotateY(-90deg);
+}
+.device-tilt-right .device-body {
+  transform: rotateY(17deg) rotateX(3deg) rotateZ(1deg);
+}
+.device-tilt-right .device-edge {
+  left: 0;
+  transform-origin: left center;
+  transform: rotateY(90deg);
+}
+.device-tilt-none {
+  perspective: none;
+  filter: drop-shadow(0 18px 28px rgb(17 24 39 / 0.16));
+}
+
+/* Кнопки на «островке» правого торца: длинная — громкость, короткая ниже — питание и сканер. */
+.device-keys {
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  top: 12.5%;
+  height: 34%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #b9bec4, #e6e9ec 50%, #b5bac1);
+  box-shadow:
+    0 0 0 1px rgb(20 28 38 / 0.2),
+    inset 0 0 0 1px rgb(255 255 255 / 0.35);
+}
+.device-key {
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #a7aeb6, #f6f7f8 50%, #a3aab2);
+  box-shadow:
+    0 0 0 1px rgb(20 28 38 / 0.28),
+    0 1px 2px rgb(20 28 38 / 0.18);
+}
+.device-key-volume {
+  top: 6%;
+  height: 46%;
+}
+.device-key-power {
+  top: 62%;
+  height: 30%;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  button:hover > .device-tilt-left .device-body,
+  a:hover > .device-tilt-left .device-body {
+    transform: rotateY(-12deg) rotateX(2deg) rotateZ(-0.5deg) translateY(-3px);
+  }
+}
+
+@media (max-width: 640px) {
+  .device-tilt-left .device-body {
+    transform: rotateY(-11deg) rotateX(2deg) rotateZ(-0.6deg);
+  }
+  .device-tilt-right .device-body {
+    transform: rotateY(11deg) rotateX(2deg) rotateZ(0.6deg);
+  }
+  .device {
+    filter: drop-shadow(9px 12px 10px rgb(17 24 39 / 0.14))
+      drop-shadow(18px 26px 24px rgb(17 24 39 / 0.11));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .device-body {
+    transition: none;
+  }
+}

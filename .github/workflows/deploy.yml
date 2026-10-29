@@ -1,0 +1,115 @@
+name: Build and deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '24'
+      - name: Set up pnpm
+        run: npm install --global pnpm@11.19.0
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Production build
+        run: pnpm build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://lanwash.ru
+    env:
+      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+      DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+      DEPLOY_HEALTHCHECK_URL: ${{ vars.DEPLOY_HEALTHCHECK_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '24'
+      - name: Set up pnpm
+        run: npm install --global pnpm@11.19.0
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Production build
+        run: pnpm build
+      - name: Check deployment settings
+        run: |
+          for name in DEPLOY_HOST DEPLOY_USER DEPLOY_PATH DEPLOY_SSH_KEY DEPLOY_KNOWN_HOSTS; do
+            if [ -z "${!name}" ]; then
+              echo "::error::$name is not configured"
+              exit 1
+            fi
+          done
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+      - name: Set up SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy
+          chmod 600 ~/.ssh/deploy
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+      - name: Publish release
+        env:
+          RELEASE: ${{ github.sha }}
+        run: |
+          set -e
+          dir="$DEPLOY_PATH"
+          target="$DEPLOY_USER@$DEPLOY_HOST"
+          ssh_cmd=(ssh -i ~/.ssh/deploy -o BatchMode=yes "$target")
+          release="$dir/releases/$RELEASE"
+
+          "${ssh_cmd[@]}" "mkdir -p '$release'"
+          tar -czf - -C dist . | "${ssh_cmd[@]}" "tar -xzf - -C '$release'"
+          previous=$("${ssh_cmd[@]}" "readlink -f '$dir/current' 2>/dev/null || true")
+          "${ssh_cmd[@]}" "ln -sfn '$release' '$dir/current.next' && mv -Tf '$dir/current.next' '$dir/current'"
+          printf '%s' "$previous" > /tmp/lanwash-previous-release
+      - name: Check published site
+        run: |
+          url="${DEPLOY_HEALTHCHECK_URL:-https://lanwash.ru}"
+          for attempt in $(seq 1 10); do
+            if curl -4 -fsS --connect-timeout 10 --max-time 20 "$url" >/dev/null; then
+              echo "Site is available: $url"
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "::error::Site did not respond after deployment"
+          exit 1
+      - name: Roll back on health-check failure
+        if: failure()
+        run: |
+          if [ -f /tmp/lanwash-previous-release ] && [ -f ~/.ssh/deploy ]; then
+            previous=$(cat /tmp/lanwash-previous-release)
+            if [ -n "$previous" ]; then
+              dir="$DEPLOY_PATH"
+              target="$DEPLOY_USER@$DEPLOY_HOST"
+              ssh -i ~/.ssh/deploy -o BatchMode=yes "$target" \
+                "ln -sfn '$previous' '$dir/current.rollback' && mv -Tf '$dir/current.rollback' '$dir/current'"
+              echo "Rolled back to $previous"
+            fi
+          fi
