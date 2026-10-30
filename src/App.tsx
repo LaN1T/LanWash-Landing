@@ -180,7 +180,7 @@ const faq = [
   ],
   [
     'Можно ли записаться на сайте?',
-    'Запись на сайте появится позже. Кнопка «Записаться на сайте — скоро» ведёт на lanwash.ru. Сейчас сценарий записи можно пройти в Android-приложении.',
+    'Да. Кнопка «Записаться на сайте» открывает веб-приложение app.lanwash.ru. Можно войти в тот же аккаунт, выбрать мойку, услуги и время.',
   ],
   [
     'На каких устройствах работает приложение?',
@@ -431,8 +431,7 @@ export default function App() {
               <div className="hero-actions">
                 <RustoreButton className="button button-primary button-large" />
                 <a className="button button-outline button-large" href={siteConfig.bookingUrl}>
-                  Записаться на сайте <span className="soon-badge">Скоро</span>{' '}
-                  <ArrowUpRight size={18} />
+                  Записаться на сайте <ArrowUpRight size={18} />
                 </a>
                 <a className="text-link" href="#booking">
                   Как записаться <ArrowDown size={18} />
