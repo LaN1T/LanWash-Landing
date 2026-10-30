@@ -20,6 +20,8 @@ import {
   Mail,
   MapPin,
   Menu,
+  Moon,
+  Sun,
   QrCode,
   ScanLine,
   ShieldCheck,
@@ -37,7 +39,13 @@ import BookingGuide from './BookingGuide'
 import DevicePhone from './DevicePhone'
 
 type ModalType = 'download' | 'business' | 'preview' | 'register' | null
+type ThemeChoice = 'light' | 'dark'
 const asset = (path: string) => import.meta.env.BASE_URL + path
+function initialTheme(): ThemeChoice {
+  const saved = localStorage.getItem('lanwash.theme')
+  if (saved === 'light' || saved === 'dark') return saved
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+}
 // Все клиентские экраны в порядке сценария: от карты до профиля. Снимки 720 × 1560 (экран A17).
 const clientScreens = [
   {
@@ -330,6 +338,12 @@ export default function App() {
   const [service, setService] = useState<'basic' | 'full'>('full')
   const [useBonus, setUseBonus] = useState(true)
   const [scrolled, setScrolled] = useState(false)
+  const [theme, setTheme] = useState<ThemeChoice>(initialTheme)
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    localStorage.setItem('lanwash.theme', theme)
+  }, [theme])
+  const bookingHref = `${siteConfig.bookingUrl}?theme=${theme}`
   const active = screens[screen] ?? screens[0]
   // Пример кошелька: 1 240 бонусов, списание до 30% чека, кешбэк 10% с денежной части.
   const balance = 1240
@@ -393,6 +407,14 @@ export default function App() {
             >
               Скачать <ArrowUpRight size={17} />
             </button>
+            <button
+              className="theme-toggle icon-button"
+              type="button"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              aria-label={theme === 'dark' ? 'Включить светлую тему' : 'Включить тёмную тему'}
+            >
+              {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
           </nav>
           <button
             className="menu-toggle icon-button"
@@ -430,7 +452,7 @@ export default function App() {
               </p>
               <div className="hero-actions">
                 <RustoreButton className="button button-primary button-large" />
-                <a className="button button-outline button-large" href={siteConfig.bookingUrl}>
+                <a className="button button-outline button-large" href={bookingHref}>
                   Записаться на сайте <ArrowUpRight size={18} />
                 </a>
                 <a className="text-link" href="#booking">
