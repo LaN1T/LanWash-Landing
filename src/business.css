@@ -57,10 +57,6 @@
   border: 1px solid #dce5e8;
   border-radius: 24px;
   padding: 25px 25px 21px;
-  background-image:
-    linear-gradient(#d8e1e454 1px, transparent 1px),
-    linear-gradient(90deg, #d8e1e454 1px, transparent 1px);
-  background-size: 40px 40px;
 }
 .biz-visual-heading {
   display: flex;

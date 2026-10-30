@@ -337,6 +337,7 @@ export default function App() {
   const [screen, setScreen] = useState(0)
   const [service, setService] = useState<'basic' | 'full'>('full')
   const [useBonus, setUseBonus] = useState(true)
+  const [bonusAmount, setBonusAmount] = useState(450)
   const [scrolled, setScrolled] = useState(false)
   const [theme, setTheme] = useState<ThemeChoice>(initialTheme)
   useEffect(() => {
@@ -349,7 +350,8 @@ export default function App() {
   const balance = 1240
   const total = service === 'full' ? 1500 : 800
   const maxBonus = Math.min(balance, Math.floor(total * 0.3))
-  const bonus = useBonus ? maxBonus : 0
+  const bonus = useBonus ? Math.min(bonusAmount, maxBonus) : 0
+  const bonusPercent = maxBonus > 0 ? (bonus / maxBonus) * 100 : 0
   const cash = total - bonus
   const cashback = Math.floor(cash * 0.1)
   const number = (amount: number) => new Intl.NumberFormat('ru-RU').format(amount)
@@ -646,6 +648,30 @@ export default function App() {
                   />
                   <span className="switch-visual" aria-hidden="true" />
                 </label>
+                <div className="calc-bonus-range">
+                  <div>
+                    <span>Списываем бонусы</span>
+                    <strong>{number(bonus)}</strong>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max={maxBonus}
+                    step="10"
+                    value={bonus}
+                    disabled={!useBonus}
+                    aria-label="Бонусы к списанию"
+                    aria-valuetext={`${bonus} бонусов`}
+                    onChange={(event) => setBonusAmount(Number(event.target.value))}
+                    style={{
+                      background: `linear-gradient(to right, var(--blue) 0%, var(--blue) ${bonusPercent}%, var(--line) ${bonusPercent}%, var(--line) 100%)`,
+                    }}
+                  />
+                  <div className="calc-bonus-limits" aria-hidden="true">
+                    <span>0</span>
+                    <span>{number(maxBonus)}</span>
+                  </div>
+                </div>
                 <dl className="calc-lines">
                   <div>
                     <dt>{service === 'full' ? 'Комплексная мойка' : 'Базовая мойка'}</dt>

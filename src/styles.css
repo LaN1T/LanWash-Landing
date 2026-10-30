@@ -268,8 +268,17 @@ svg {
   padding: 10px 18px;
   font-size: 12px;
 }
+.theme-toggle {
+  margin-left: 20px;
+}
 .menu-toggle {
   display: none;
+}
+@media (max-width: 960px) {
+  .main-nav .theme-toggle {
+    align-self: flex-end;
+    margin-left: 0;
+  }
 }
 .hero {
   display: grid;
@@ -2767,6 +2776,55 @@ svg.lucide {
   outline: 3px solid #8baef4;
   outline-offset: 3px;
 }
+.calc-bonus-range {
+  display: grid;
+  gap: 10px;
+  padding-inline: 4px;
+}
+.calc-bonus-range > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #6e7b85;
+  font-size: 11px;
+}
+.calc-bonus-range > div strong {
+  color: var(--ink);
+  font-size: 12px;
+}
+.calc-bonus-range input {
+  appearance: none;
+  width: 100%;
+  height: 5px;
+  margin: 6px 0;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.calc-bonus-range input::-webkit-slider-thumb {
+  appearance: none;
+  width: 19px;
+  height: 19px;
+  border: 3px solid var(--paper);
+  border-radius: 50%;
+  background: var(--blue);
+  box-shadow: 0 0 0 1px var(--blue);
+}
+.calc-bonus-range input::-moz-range-thumb {
+  width: 13px;
+  height: 13px;
+  border: 3px solid var(--paper);
+  border-radius: 50%;
+  background: var(--blue);
+  box-shadow: 0 0 0 1px var(--blue);
+}
+.calc-bonus-range input:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.calc-bonus-range .calc-bonus-limits {
+  font-size: 10px;
+}
 .calc-lines {
   display: grid;
   gap: 10px;
@@ -3026,45 +3084,39 @@ svg.lucide {
   color: var(--ink);
   box-shadow: 0 1px 3px rgb(20 37 54 / 0.12);
 }
-.apply-chips {
+.apply-duration {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.apply-chips > button,
-.apply-minutes {
-  display: inline-flex;
   align-items: center;
-  gap: 4px;
-  min-height: 36px;
-  padding: 0 13px;
-  border: 1px solid #d9e1e8;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 620;
-  color: #4f606c;
+  gap: 12px;
+  width: min(100%, 200px);
+  min-height: 56px;
+  margin-inline: auto;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
-.apply-chips > button[aria-pressed='true'],
-.apply-minutes.active {
-  background: var(--blue);
+.apply-duration:focus-within {
   border-color: var(--blue);
-  color: #fff;
+  box-shadow: 0 0 0 3px #2364e41f;
 }
-.apply .apply-minutes input {
-  width: 44px;
-  min-height: 0;
+.apply .apply-service .apply-duration input {
+  flex: 1;
+  min-width: 0;
+  min-height: 42px;
   padding: 0;
   border: 0;
   background: transparent;
-  color: inherit;
-  font-size: 12px;
-  font-weight: 650;
-  text-align: right;
+  color: var(--ink);
+  font-size: 24px;
+  font-weight: 720;
   box-shadow: none;
 }
-.apply .apply-minutes input::placeholder {
-  color: inherit;
-  opacity: 0.7;
+.apply-duration > span {
+  color: #84919b;
+  font-size: 13px;
 }
 .apply-add {
   border: 1px dashed #b8c6d3;

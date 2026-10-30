@@ -42,15 +42,12 @@ type ServiceDraft = {
   name: string
   price: string
   duration: string
-  // Своя длительность: поле ввода не переключается на готовую кнопку, пока его редактируют.
-  customDuration: boolean
   description: string
 }
 type Picture = { key: number; blob: Blob; url: string; mediaId?: string }
 
 const storageKey = 'lanwash.wash-applications'
 const steps = ['Мойка', 'Услуги и цены', 'Оформление и фото', 'Контакты и проверка']
-const durationPresets = [10, 15, 30, 40, 60, 90, 120]
 const maxPhotos = 10
 const statusLabel: Record<Status, string> = {
   PENDING: 'На проверке',
@@ -65,7 +62,6 @@ const newService = (): ServiceDraft => ({
   name: '',
   price: '',
   duration: '40',
-  customDuration: false,
   description: '',
 })
 
@@ -608,42 +604,28 @@ export default function ApplyForm({ onDirtyChange }: { onDirtyChange: (dirty: bo
                   </Field>
                 </div>
                 <div className="apply-field">
-                  <span className="apply-label">Длительность</span>
-                  <div className="apply-chips">
-                    {durationPresets.map((minutes) => (
-                      <button
-                        type="button"
-                        key={minutes}
-                        aria-pressed={!service.customDuration && duration === minutes}
-                        onClick={() =>
-                          updateService(service.key, {
-                            duration: String(minutes),
-                            customDuration: false,
-                          })
-                        }
-                      >
-                        {durationText(minutes)}
-                      </button>
-                    ))}
-                    <label className={'apply-minutes' + (service.customDuration ? ' active' : '')}>
-                      <input
-                        value={service.customDuration ? service.duration : ''}
-                        placeholder="своя"
-                        inputMode="numeric"
-                        aria-label="Своя длительность в минутах"
-                        onChange={(event) =>
-                          updateService(service.key, {
-                            duration: event.target.value.replace(/\D/g, '').slice(0, 3),
-                            customDuration: true,
-                          })
-                        }
-                      />
-                      мин
-                    </label>
+                  <label className="apply-label" htmlFor={`service-duration-${service.key}`}>
+                    Длительность
+                  </label>
+                  <div className="apply-duration">
+                    <input
+                      id={`service-duration-${service.key}`}
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="off"
+                      maxLength={3}
+                      value={service.duration}
+                      onChange={(event) =>
+                        updateService(service.key, {
+                          duration: event.target.value.replace(/\D/g, '').slice(0, 3),
+                        })
+                      }
+                    />
+                    <span>мин</span>
                   </div>
-                  {durationBad && (
-                    <span className="apply-hint apply-hint-error">От 5 до 480 минут</span>
-                  )}
+                  <span className={durationBad ? 'apply-hint apply-hint-error' : 'apply-hint'}>
+                    От 5 до 480 минут
+                  </span>
                 </div>
                 <Field
                   label="Описание услуги"
