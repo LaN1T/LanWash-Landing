@@ -44,7 +44,7 @@ const asset = (path: string) => import.meta.env.BASE_URL + path
 function initialTheme(): ThemeChoice {
   const saved = localStorage.getItem('lanwash.theme')
   if (saved === 'light' || saved === 'dark') return saved
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  return 'light'
 }
 // Все клиентские экраны в порядке сценария: от карты до профиля. Снимки 720 × 1560 (экран A17).
 const clientScreens = [

@@ -6,9 +6,8 @@
     <meta name="theme-color" content="#2364e4" />
     <script>
       ;(() => {
-        const saved = localStorage.getItem('lanwash.theme')
-        const dark = saved === 'dark' || (!saved && matchMedia('(prefers-color-scheme: dark)').matches)
-        document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+        document.documentElement.dataset.theme =
+          localStorage.getItem('lanwash.theme') === 'dark' ? 'dark' : 'light'
       })()
     </script>
     <meta
