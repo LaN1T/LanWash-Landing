@@ -343,6 +343,8 @@ export default function App() {
   useEffect(() => {
     document.documentElement.dataset.theme = theme
     localStorage.setItem('lanwash.theme', theme)
+    const domain = window.location.hostname.endsWith('lanwash.ru') ? ';domain=.lanwash.ru' : ''
+    document.cookie = `lanwash.theme=${theme};path=/;max-age=31536000;SameSite=Lax${domain};Secure`
   }, [theme])
   const bookingHref = `${siteConfig.bookingUrl}?theme=${theme}`
   const active = screens[screen] ?? screens[0]
