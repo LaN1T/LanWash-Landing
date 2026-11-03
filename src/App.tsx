@@ -37,6 +37,7 @@ import ApplyForm from './ApplyForm'
 import BusinessPage from './BusinessPage'
 import BookingGuide from './BookingGuide'
 import DevicePhone from './DevicePhone'
+import CookieNotice from './CookieNotice'
 
 type ModalType = 'download' | 'business' | 'preview' | 'register' | null
 type ThemeChoice = 'light' | 'dark'
@@ -391,6 +392,7 @@ export default function App() {
       <a className="skip-link" href="#main">
         К содержанию
       </a>
+      <CookieNotice />
       <header className={'site-header' + (scrolled ? ' is-scrolled' : '')}>
         <div className="container header-inner">
           <Brand business={isBusiness} />

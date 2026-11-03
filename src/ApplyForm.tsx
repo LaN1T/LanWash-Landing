@@ -281,6 +281,7 @@ export default function ApplyForm({ onDirtyChange }: { onDirtyChange: (dirty: bo
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [consent, setConsent] = useState(false)
+  const [termsAccepted, setTermsAccepted] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [pictureError, setPictureError] = useState<string | null>(null)
@@ -321,6 +322,7 @@ export default function ApplyForm({ onDirtyChange }: { onDirtyChange: (dirty: bo
     if (length(name) < 2) missing.push('имя')
     if (phone.length !== 10) missing.push('телефон')
     if (!consent) missing.push('согласие на обработку данных')
+    if (!termsAccepted) missing.push('принятие пользовательского соглашения')
   }
 
   const updateService = (key: number, patch: Partial<ServiceDraft>) =>
@@ -843,11 +845,21 @@ export default function ApplyForm({ onDirtyChange }: { onDirtyChange: (dirty: bo
               onChange={(event) => setConsent(event.target.checked)}
             />
             <span>
-              Согласен на обработку персональных данных в соответствии с{' '}
-              <a href={import.meta.env.BASE_URL + 'privacy.html'} target="_blank" rel="noreferrer">
-                политикой конфиденциальности
-              </a>{' '}
-              и принимаю{' '}
+              Даю{' '}
+              <a href={import.meta.env.BASE_URL + 'consent.html'} target="_blank" rel="noreferrer">
+                согласие на обработку персональных данных
+              </a>
+              .
+            </span>
+          </label>
+          <label className="apply-consent">
+            <input
+              type="checkbox"
+              checked={termsAccepted}
+              onChange={(event) => setTermsAccepted(event.target.checked)}
+            />
+            <span>
+              Принимаю{' '}
               <a href={import.meta.env.BASE_URL + 'terms.html'} target="_blank" rel="noreferrer">
                 пользовательское соглашение
               </a>
