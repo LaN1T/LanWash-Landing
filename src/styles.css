@@ -3495,10 +3495,11 @@ svg.lucide {
   padding: 16px 18px;
   border: 1px solid var(--line);
   border-radius: 20px;
-  background: var(--surface);
+  background: #fff;
   color: var(--text);
   box-shadow: 0 14px 40px #17203326;
 }
+:root[data-theme='dark'] .cookie-notice { background: #182232; }
 .cookie-notice strong { display: block; margin-bottom: 4px; font-size: 14px; }
 .cookie-notice p { color: var(--muted); font-size: 12px; line-height: 1.5; }
 .cookie-notice a { color: var(--brand); text-decoration: underline; }

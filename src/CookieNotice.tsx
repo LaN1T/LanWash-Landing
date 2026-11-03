@@ -12,8 +12,8 @@ export default function CookieNotice() {
   return (
     <aside className="cookie-notice" aria-label="Использование cookie">
       <div>
-        <strong>Только нужные cookie</strong>
-        <p>Запоминаем тему и помогаем аккаунту работать. Без рекламы и трекеров. Подробнее — <a href="privacy.html">в Политике</a>.</p>
+        <strong>Использование cookie</strong>
+        <p>Используем cookie для корректной работы сайта и сохранения настроек. Без рекламы и аналитики. Подробнее — <a href="privacy.html">в Политике конфиденциальности</a>.</p>
       </div>
       <button type="button" onClick={accept}>Понятно</button>
     </aside>
