@@ -6,8 +6,10 @@
     <meta name="theme-color" content="#2364e4" />
     <script>
       ;(() => {
-        const saved = document.cookie.split('; ').find((item) => item.startsWith('lanwash.theme='))?.split('=')[1]
-        document.documentElement.dataset.theme = saved || (localStorage.getItem('lanwash.theme') === 'dark' ? 'dark' : 'light')
+        const cookieTheme = document.cookie.split('; ').find((item) => item.startsWith('lanwash.theme='))?.split('=')[1]
+        const saved = cookieTheme || localStorage.getItem('lanwash.theme')
+        const dark = saved === 'dark' || (saved === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light'
       })()
     </script>
     <meta

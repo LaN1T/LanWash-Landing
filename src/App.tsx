@@ -43,9 +43,7 @@ type ModalType = 'download' | 'business' | 'preview' | 'register' | null
 type ThemeChoice = 'light' | 'dark'
 const asset = (path: string) => import.meta.env.BASE_URL + path
 function initialTheme(): ThemeChoice {
-  const saved = localStorage.getItem('lanwash.theme')
-  if (saved === 'light' || saved === 'dark') return saved
-  return 'light'
+  return document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'
 }
 // Все клиентские экраны в порядке сценария: от карты до профиля. Снимки 720 × 1560 (экран A17).
 const clientScreens = [

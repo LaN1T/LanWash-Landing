@@ -68,14 +68,28 @@ body {
 }
 .legal-theme-toggle {
   margin-left: auto;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid #ffffff40;
-  border-radius: 999px;
+  border-radius: 9px;
   background: #ffffff16;
   color: #fff;
-  padding: 7px 12px;
-  font: inherit;
-  font-size: 13px;
+  padding: 0;
   cursor: pointer;
+  transition: background 0.2s;
+}
+.legal-theme-toggle:hover {
+  background: #ffffff2b;
+}
+.legal-theme-toggle[hidden] {
+  display: none;
+}
+.legal-theme-toggle svg {
+  display: block;
 }
 .legal-header a.back {
   color: #fff;
