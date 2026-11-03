@@ -17,6 +17,18 @@
   font-family: Manrope, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
+:root[data-theme='dark'] {
+  --ink: #e8edf5;
+  --muted: #a3b0c3;
+  --line: #2b384c;
+  --paper: #182232;
+  --bg: #0f1725;
+  color-scheme: dark;
+}
+:root[data-theme='dark'] .legal-main p,
+:root[data-theme='dark'] .legal-main li {
+  color: #e8edf5;
+}
 * {
   box-sizing: border-box;
 }
@@ -53,6 +65,17 @@ body {
 .legal-brand img {
   width: 34px;
   height: 34px;
+}
+.legal-theme-toggle {
+  margin-left: auto;
+  border: 1px solid #ffffff40;
+  border-radius: 999px;
+  background: #ffffff16;
+  color: #fff;
+  padding: 7px 12px;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
 }
 .legal-header a.back {
   color: #fff;
