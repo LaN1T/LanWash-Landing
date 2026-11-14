@@ -421,7 +421,7 @@
   color: #62778a;
   font-weight: 680;
 }
-.biz-demo-section {
+.biz-connect-section {
   display: grid;
   grid-template-columns: 1.25fr 0.75fr;
   gap: 72px;
@@ -432,22 +432,22 @@
   color: #fff;
   margin-top: 88px;
 }
-.biz-demo-copy .eyebrow {
+.biz-connect-copy .eyebrow {
   color: #95b0c4;
 }
-.biz-demo-copy h2 {
+.biz-connect-copy h2 {
   font-size: clamp(27px, 3vw, 37px);
   margin-top: 20px;
   letter-spacing: -1.3px;
 }
-.biz-demo-copy > p {
+.biz-connect-copy > p {
   font-size: 12px;
   line-height: 1.9;
   color: #95aabb;
   margin-top: 23px;
   max-width: 540px;
 }
-.biz-demo-actions {
+.biz-connect-actions {
   display: grid;
   gap: 12px;
 }
@@ -459,7 +459,7 @@
 .biz-button-outline:hover {
   background: #233d51;
 }
-.biz-demo-actions > span {
+.biz-connect-actions > span {
   color: #7f98ac;
   font-size: 9px;
   line-height: 1.7;
@@ -559,7 +559,7 @@
     flex-wrap: wrap;
     gap: 6px;
   }
-  .biz-demo-section {
+  .biz-connect-section {
     padding: 43px;
     gap: 42px;
   }
@@ -629,12 +629,12 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 35px 27px;
   }
-  .biz-demo-section {
+  .biz-connect-section {
     grid-template-columns: 1fr;
     gap: 30px;
     margin-top: 65px;
   }
-  .biz-demo-actions {
+  .biz-connect-actions {
     max-width: 350px;
   }
   .biz-faq {
@@ -780,19 +780,19 @@
   .biz-moderation-note p {
     font-size: 10px;
   }
-  .biz-demo-section {
+  .biz-connect-section {
     padding: 31px 24px;
     border-radius: 17px;
     margin-top: 47px;
   }
-  .biz-demo-copy h2 {
+  .biz-connect-copy h2 {
     font-size: 26px;
     letter-spacing: -1px;
   }
-  .biz-demo-copy > p {
+  .biz-connect-copy > p {
     font-size: 11px;
   }
-  .biz-demo-actions .button {
+  .biz-connect-actions .button {
     font-size: 12px;
     padding-inline: 14px;
   }

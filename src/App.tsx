@@ -656,7 +656,7 @@ export default function App() {
               <div className="calc-card">
                 <div className="calc-head">
                   <strong>Расчёт визита</strong>
-                  <span className="demo-label">Пример</span>
+                  <span className="example-label">Пример</span>
                 </div>
                 <div className="calc-segmented" role="group" aria-label="Услуга в примере">
                   <button aria-pressed={service === 'basic'} onClick={() => setService('basic')}>
@@ -727,7 +727,7 @@ export default function App() {
                   оплаты
                 </span>
               </div>
-              <p className="demo-calculation-note">
+              <p className="example-calculation-note">
                 Кешбэк 10% начисляется с денежной части оплаты. Это пример расчёта, не настоящая
                 запись.
               </p>

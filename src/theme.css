@@ -134,10 +134,10 @@
 :root[data-theme='dark'] .loyalty-copy > p,
 :root[data-theme='dark'] .check-list li,
 :root[data-theme='dark'] .small-note,
-:root[data-theme='dark'] .demo-calculation-note {
+:root[data-theme='dark'] .example-calculation-note {
   color: var(--muted);
 }
-:root[data-theme='dark'] .demo-label {
+:root[data-theme='dark'] .example-label {
   background: #253247;
   color: var(--muted);
 }
@@ -192,7 +192,7 @@
 :root[data-theme='dark'] .booking-guide-intro > p,
 :root[data-theme='dark'] .booking-guide-copy > p,
 :root[data-theme='dark'] .booking-guide-note,
-:root[data-theme='dark'] .booking-guide-demo,
+:root[data-theme='dark'] .booking-guide-example,
 :root[data-theme='dark'] .booking-device figcaption,
 :root[data-theme='dark'] .booking-guide-attribution {
   color: var(--muted);
@@ -205,7 +205,7 @@
   background: radial-gradient(ellipse at 60% 25%, #1b2b43 0, #141d2b 70%);
 }
 :root[data-theme='dark'] .booking-guide-detail,
-:root[data-theme='dark'] .booking-guide-demo svg {
+:root[data-theme='dark'] .booking-guide-example svg {
   color: var(--blue);
 }
 :root[data-theme='dark'] .business-section {
@@ -277,8 +277,8 @@
 :root[data-theme='dark'] .biz-role-card p,
 :root[data-theme='dark'] .biz-moderation-note p,
 :root[data-theme='dark'] .biz-moderation-note strong,
-:root[data-theme='dark'] .biz-demo-copy > p,
-:root[data-theme='dark'] .biz-demo-actions > span {
+:root[data-theme='dark'] .biz-connect-copy > p,
+:root[data-theme='dark'] .biz-connect-actions > span {
   color: var(--muted);
 }
 :root[data-theme='dark'] .biz-loyalty-rules dt,
@@ -300,14 +300,14 @@
 :root[data-theme='dark'] .biz-moderation-note > svg {
   color: var(--muted);
 }
-:root[data-theme='dark'] .biz-demo-section {
+:root[data-theme='dark'] .biz-connect-section {
   background: #141d2b;
 }
-:root[data-theme='dark'] .biz-demo-section .button-white {
+:root[data-theme='dark'] .biz-connect-section .button-white {
   background: #2364e4;
   color: #fff;
 }
-:root[data-theme='dark'] .biz-demo-section .button-white:hover {
+:root[data-theme='dark'] .biz-connect-section .button-white:hover {
   background: #1955cd;
 }
 :root[data-theme='dark'] .biz-faq-list summary {

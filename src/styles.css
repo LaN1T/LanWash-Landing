@@ -821,7 +821,7 @@ h2 {
 .small-note svg {
   color: #7a91aa;
 }
-.demo-label {
+.example-label {
   color: #95a1aa;
   background: #f3f5f7;
   padding: 5px 8px;
@@ -851,7 +851,7 @@ h2 {
   box-shadow: 0 1px 3px #0001;
   transition: transform 0.2s;
 }
-.demo-calculation-note {
+.example-calculation-note {
   font-size: 9px;
   line-height: 1.75;
   color: #9eabb4;
@@ -2071,7 +2071,7 @@ h2 {
   .small-note {
     font-size: 9px;
   }
-  .demo-calculation-note {
+  .example-calculation-note {
     font-size: 9px;
   }
   .business-section {
@@ -2384,7 +2384,7 @@ h2 {
 .small-note {
   color: #6b7c87;
 }
-.demo-calculation-note {
+.example-calculation-note {
   color: #758795;
 }
 .business-copy p,
@@ -2423,7 +2423,7 @@ h2 {
   .lead-form select {
     font-size: 16px;
   }
-  .demo-calculation-note {
+  .example-calculation-note {
     font-size: 10px;
   }
 }
@@ -2866,7 +2866,7 @@ svg.lucide {
   background: #e7f5ec;
   color: #23784a;
 }
-.loyalty-app .demo-calculation-note {
+.loyalty-app .example-calculation-note {
   margin-top: 0;
 }
 

@@ -18,7 +18,7 @@
   line-height: 1.8;
   color: #677482;
 }
-.booking-guide-demo {
+.booking-guide-example {
   display: flex;
   align-items: flex-start;
   gap: 9px;
@@ -27,7 +27,7 @@
   font-size: 12px;
   line-height: 1.7;
 }
-.booking-guide-demo svg {
+.booking-guide-example svg {
   margin-top: 1px;
   color: #2364e4;
 }

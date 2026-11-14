@@ -77,7 +77,7 @@ export default function BookingGuide() {
             Шесть шагов — на каждом настоящий экран приложения. Сначала зарегистрируйтесь или
             войдите в Android-приложение LanWash.
           </p>
-          <div className="booking-guide-demo">
+          <div className="booking-guide-example">
             <CheckCircle2 size={18} />
             <span>Мойки, цены и имена на экранах — примеры.</span>
           </div>
