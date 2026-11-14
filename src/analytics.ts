@@ -83,15 +83,20 @@ export function startMetrika() {
   document.head.appendChild(script)
 }
 
-/** Удаляет cookie и записи Метрики на домене сайта (список — yandex.ru/support/metrica/general/cookie-usage.html). */
-function clearMetrikaData() {
+/**
+ * Удаляет cookie и записи Метрики на домене сайта (список — yandex.ru/support/metrica/general/cookie-usage.html).
+ * Вызывается при отказе и при каждом запуске без согласия: tag.js успевает дописать _ym_retryReqs,
+ * пока страница перезагружается.
+ */
+export function clearMetrikaData() {
   const host = window.location.hostname
   const domains = ['']
   const parts = host.split('.')
   for (let i = 0; i < parts.length - 1; i++) domains.push(';domain=.' + parts.slice(i).join('.'))
   for (const item of document.cookie.split('; ')) {
     const name = item.split('=')[0]
-    if (!name.startsWith('_ym')) continue
+    // mdd в перечне Яндекса нет, но её ставит tag.js: до согласия её не бывает.
+    if (!name.startsWith('_ym') && name !== 'mdd') continue
     for (const domain of domains) {
       document.cookie = `${name}=;path=/;max-age=0${domain}`
     }

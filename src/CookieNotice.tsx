@@ -11,8 +11,10 @@ export default function CookieNotice({ onClose }: { onClose: () => void }) {
   const current = readChoice()
 
   function choose(value: AnalyticsChoice) {
-    saveChoice(value)
+    // Сначала закрываем (это убирает #cookie-settings из адреса): отказ после согласия
+    // перезагружает страницу, и плашка не должна открыться снова.
     onClose()
+    saveChoice(value)
   }
 
   return (
