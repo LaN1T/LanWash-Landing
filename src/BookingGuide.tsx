@@ -107,7 +107,11 @@ export default function BookingGuide() {
         </ol>
         <p className="booking-guide-attribution">
           Карта на скриншотах — Яндекс Карты (
-          <a href="https://yandex.ru/legal/maps_termsofuse/" target="_blank" rel="noreferrer">
+          <a
+            href="https://yandex.ru/legal/maps_termsofuse/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             условия использования
           </a>
           ).

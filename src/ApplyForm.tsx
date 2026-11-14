@@ -685,7 +685,7 @@ export default function ApplyForm({ onLossChange }: { onLossChange: (loss: Apply
             className="button button-quiet"
             href={siteConfig.businessRustoreUrl}
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
           >
             <Download size={18} /> «LanWash Бизнес» в RuStore
           </a>
@@ -1074,7 +1074,11 @@ export default function ApplyForm({ onLossChange }: { onLossChange: (loss: Apply
             />
             <span>
               Даю{' '}
-              <a href={import.meta.env.BASE_URL + 'consent.html'} target="_blank" rel="noreferrer">
+              <a
+                href={import.meta.env.BASE_URL + 'consent.html'}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 согласие на обработку персональных данных
               </a>
               .
@@ -1088,7 +1092,11 @@ export default function ApplyForm({ onLossChange }: { onLossChange: (loss: Apply
             />
             <span>
               Принимаю{' '}
-              <a href={import.meta.env.BASE_URL + 'terms.html'} target="_blank" rel="noreferrer">
+              <a
+                href={import.meta.env.BASE_URL + 'terms.html'}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 пользовательское соглашение
               </a>
               .

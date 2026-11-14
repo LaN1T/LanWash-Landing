@@ -4,7 +4,24 @@
     .split('; ')
     .find((item) => item.startsWith('lanwash.theme='))
     ?.split('=')[1]
-  const saved = cookieTheme || localStorage.getItem('lanwash.theme')
+  // localStorage может быть запрещён (приватный режим, блокировка cookie) — тогда светлая тема.
+  const storage = {
+    get(key) {
+      try {
+        return localStorage.getItem(key)
+      } catch {
+        return null
+      }
+    },
+    set(key, value) {
+      try {
+        localStorage.setItem(key, value)
+      } catch {
+        // Выбор останется в cookie.
+      }
+    },
+  }
+  const saved = cookieTheme || storage.get('lanwash.theme')
   const dark =
     saved === 'dark' ||
     (saved === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
@@ -17,7 +34,7 @@
 
   function setTheme(theme) {
     root.dataset.theme = theme
-    localStorage.setItem('lanwash.theme', theme)
+    storage.set('lanwash.theme', theme)
     const domain = window.location.hostname.endsWith('lanwash.ru') ? ';domain=.lanwash.ru' : ''
     document.cookie = `lanwash.theme=${theme};path=/;max-age=31536000;SameSite=Lax${domain};Secure`
     const button = document.getElementById('legal-theme-toggle')

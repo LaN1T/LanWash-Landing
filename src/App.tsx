@@ -309,7 +309,7 @@ function RustoreButton({ className = 'button button-primary' }: { className?: st
   const href =
     siteConfig.audience === 'business' ? siteConfig.businessRustoreUrl : siteConfig.rustoreUrl
   return (
-    <a className={className} href={href} target="_blank" rel="noreferrer">
+    <a className={className} href={href} target="_blank" rel="noopener noreferrer">
       <Download size={19} /> Скачать в RuStore <ArrowUpRight size={18} />
     </a>
   )
@@ -915,7 +915,11 @@ export default function App() {
               {siteConfig.ageRating}
             </span>
           </span>
-          <a href="https://yandex.ru/legal/maps_termsofuse/" target="_blank" rel="noreferrer">
+          <a
+            href="https://yandex.ru/legal/maps_termsofuse/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Карта на скриншотах © Яндекс <ArrowUpRight size={12} />
           </a>
         </div>
