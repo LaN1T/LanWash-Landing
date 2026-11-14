@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import {
@@ -33,14 +33,24 @@ import {
   ChartNoAxesCombined,
 } from 'lucide-react'
 import { siteConfig } from './config'
-import ApplyForm from './ApplyForm'
 import type { ApplyLoss } from './ApplyForm'
-import BusinessPage from './BusinessPage'
 import BookingGuide from './BookingGuide'
 import DevicePhone from './DevicePhone'
 import CookieNotice from './CookieNotice'
 import { readChoice } from './analytics'
 import { writeStorage } from './storage'
+
+// Бизнес-страница и анкета — отдельные чанки: на клиентской версии (основная аудитория) их код
+// не грузится. Бизнес-версия начинает загрузку своей страницы сразу, анкету — в простое.
+const loadBusinessPage = () => import('./BusinessPage')
+const loadApplyForm = () => import('./ApplyForm')
+const BusinessPage = lazy(loadBusinessPage)
+const ApplyForm = lazy(loadApplyForm)
+if (siteConfig.audience === 'business') {
+  void loadBusinessPage()
+  const idle = window.requestIdleCallback ?? ((callback: () => void) => setTimeout(callback, 1500))
+  idle(() => void loadApplyForm())
+}
 
 type ModalType = 'download' | 'business' | 'preview' | 'register' | null
 type ThemeChoice = 'light' | 'dark'
@@ -453,11 +463,13 @@ export default function App() {
         </div>
       </header>
       {isBusiness ? (
-        <BusinessPage
-          onApply={() => open('business')}
-          onDownload={() => open('download')}
-          clientUrl={siteConfig.clientUrl}
-        />
+        <Suspense fallback={<main id="main" className="page-loading" />}>
+          <BusinessPage
+            onApply={() => open('business')}
+            onDownload={() => open('download')}
+            clientUrl={siteConfig.clientUrl}
+          />
+        </Suspense>
       ) : (
         <main id="main">
           <section className="hero container" id="top">
@@ -962,7 +974,15 @@ export default function App() {
       )}
       {modal === 'business' && (
         <Modal key={modal} title="Подключить мойку" onClose={closeApply} className="modal-apply">
-          <ApplyForm onLossChange={setApplyLoss} />
+          <Suspense
+            fallback={
+              <p className="apply-fallback" role="status">
+                Загружаем анкету…
+              </p>
+            }
+          >
+            <ApplyForm onLossChange={setApplyLoss} />
+          </Suspense>
         </Modal>
       )}
       {modal === 'preview' && (

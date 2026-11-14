@@ -143,6 +143,26 @@ root /var/www/lanwash/current;
 
 Если меняете настройки счётчика, обновите `privacy.html` (разделы 2–6) и `consent.html#analytics`. В интерфейсе Метрики Вебвизор тоже должен быть выключен.
 
+## Шрифт
+
+`public/fonts/manrope.woff2` — вариативный Manrope (ось `wght` 200–800), подмножество: латиница (U+0000–00FF и типографские знаки), кириллица (U+0400–045F, Ґ, Ұ, №), ₽, стрелки ← ↑ → ↓, минус. Это все символы, которые есть на сайте и в документах. Файл один, а не два по `unicode-range`: на каждой странице есть и кириллица, и латиница с цифрами, так что два файла дали бы лишний запрос без экономии. `unicode-range` в `@font-face` (`src/styles.css`, `public/legal.css`) описывает, что в файле есть: остальные символы браузер возьмёт из Arial, не скачивая шрифт.
+
+Было: `manrope.ttf` 164,7 КБ. Стало: `manrope.woff2` 32,7 КБ.
+
+Лицензия — SIL OFL 1.1 (`public/fonts/OFL.txt`, лежит рядом со шрифтом и попадает в сборку). У Manrope нет Reserved Font Name, поэтому подмножество можно распространять под тем же именем; в таблице `name` сохранены копирайт и ссылка на лицензию. Продавать сам шрифт отдельно нельзя, производные — только под OFL.
+
+Пересобрать (исходный TTF — в истории git, fonttools ставится во временное окружение, не в проект):
+
+```bash
+git show f73135d:public/fonts/manrope.ttf > /tmp/manrope.ttf
+python3 -m venv /tmp/fontenv && /tmp/fontenv/bin/pip install fonttools brotli
+/tmp/fontenv/bin/pyftsubset /tmp/manrope.ttf --flavor=woff2 --layout-features='*' \
+  --name-IDs='*' --name-languages='*' --output-file=public/fonts/manrope.woff2 \
+  --unicodes='U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0301,U+0304,U+0308,U+0329,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2000-206F,U+20AC,U+20BD,U+2116,U+2122,U+2190-2193,U+2212,U+2215,U+FEFF,U+FFFD'
+```
+
+Если на сайте появятся новые символы (например, казахские буквы), добавьте их в `--unicodes` и в оба `unicode-range`.
+
 ## Страницы ошибок
 
 `public/404.html` и `public/50x.html` — в стиле документов, со ссылкой на главную. Ссылки и стили ведут к корню сайта, даже если страницу отдали по глубокому адресу.

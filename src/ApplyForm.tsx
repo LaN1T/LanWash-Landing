@@ -19,6 +19,7 @@ import {
 } from 'lucide-react'
 import { siteConfig } from './config'
 import { readStorage, writeStorage } from './storage'
+import './apply-form.css'
 
 /*
  * Анкета подключения мойки — те же шаги и правила, что в «LanWash Бизнес» (WashApplicationForm.kt).
@@ -396,6 +397,26 @@ export default function ApplyForm({ onLossChange }: { onLossChange: (loss: Apply
   const [pictureError, setPictureError] = useState<string | null>(null)
   const body = useRef<HTMLDivElement>(null)
 
+  // Превью фото — Object URL. Освобождаем их, когда фото удалили, заменили, заявку отправили
+  // или окно закрыли: иначе картинки до 1600 px остаются в памяти до перезагрузки страницы.
+  const previewUrls = useRef(new Set<string>())
+  const mounted = useRef(true)
+  useEffect(() => {
+    const current = new Set(
+      [logo, cover, ...photos].flatMap((picture) => (picture ? [picture.url] : [])),
+    )
+    for (const url of previewUrls.current) if (!current.has(url)) URL.revokeObjectURL(url)
+    previewUrls.current = current
+  }, [logo, cover, photos])
+  useEffect(() => {
+    mounted.current = true
+    return () => {
+      mounted.current = false
+      for (const url of previewUrls.current) URL.revokeObjectURL(url)
+      previewUrls.current.clear()
+    }
+  }, [])
+
   const dirty = view === 'form' && (washName.trim() !== '' || address.trim() !== '')
   const passwordShown = Object.keys(credentials).length > 0
   const loss: ApplyLoss = passwordShown
@@ -515,22 +536,33 @@ export default function ApplyForm({ onLossChange }: { onLossChange: (loss: Apply
   async function pick(files: FileList | null, mode: 'logo' | 'cover' | 'photo') {
     setPictureError(null)
     if (!files?.length) return
-    try {
-      if (mode === 'photo') {
-        const room = maxPhotos - photos.length
-        const added: Picture[] = []
-        for (const file of [...files].slice(0, room)) {
-          const blob = await prepareImage(file, 'photo')
-          added.push({ key: nextKey++, blob, url: URL.createObjectURL(blob) })
-        }
-        setPhotos((list) => [...list, ...added])
-        if (files.length > room) setPictureError(`Можно добавить не больше ${maxPhotos} фото`)
-      } else {
-        const blob = await prepareImage(files[0], mode)
-        const picture = { key: nextKey++, blob, url: URL.createObjectURL(blob) }
-        if (mode === 'logo') setLogo(picture)
-        else setCover(picture)
+    const toPicture = (blob: Blob): Picture => ({
+      key: nextKey++,
+      blob,
+      url: URL.createObjectURL(blob),
+    })
+    if (mode === 'photo') {
+      const room = maxPhotos - photos.length
+      const blobs: Blob[] = []
+      let failure: string | null = null
+      try {
+        for (const file of [...files].slice(0, room)) blobs.push(await prepareImage(file, 'photo'))
+      } catch (reason) {
+        failure = (reason as Error).message
       }
+      // Окно закрыли, пока фото готовились, — превью уже некому показать.
+      if (!mounted.current) return
+      const added = blobs.map(toPicture)
+      if (added.length) setPhotos((list) => [...list, ...added])
+      if (failure) setPictureError(failure)
+      else if (files.length > room) setPictureError(`Можно добавить не больше ${maxPhotos} фото`)
+      return
+    }
+    try {
+      const blob = await prepareImage(files[0], mode)
+      if (!mounted.current) return
+      if (mode === 'logo') setLogo(toPicture(blob))
+      else setCover(toPicture(blob))
     } catch (reason) {
       setPictureError((reason as Error).message)
     }

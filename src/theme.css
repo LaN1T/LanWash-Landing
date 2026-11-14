@@ -364,118 +364,12 @@
   background: #1d2838;
 }
 :root[data-theme='dark'] .lead-form input,
-:root[data-theme='dark'] .lead-form select,
-:root[data-theme='dark'] .apply-field input,
-:root[data-theme='dark'] .apply-field select,
-:root[data-theme='dark'] .apply-field textarea {
+:root[data-theme='dark'] .lead-form select {
   background: #222f42;
   color: var(--ink);
   border-color: var(--line);
 }
-:root[data-theme='dark'] .apply-card,
-:root[data-theme='dark'] .apply-step,
-:root[data-theme='dark'] .apply-review,
-:root[data-theme='dark'] .apply-form-section {
-  background: #182232;
-  border-color: var(--line);
-}
-:root[data-theme='dark'] .apply-hint,
-:root[data-theme='dark'] .apply-label,
-:root[data-theme='dark'] .apply-review dd {
-  color: var(--muted);
-}
-:root[data-theme='dark'] .apply input:not([type='checkbox'], [type='file']),
-:root[data-theme='dark'] .apply textarea {
-  background: #222f42;
-  color: var(--ink);
-  border-color: var(--line);
-}
-:root[data-theme='dark'] .apply-progress span {
-  background: #34445b;
-}
-:root[data-theme='dark'] .apply-progress span.active {
-  background: #2364e4;
-}
-:root[data-theme='dark'] .apply-segmented {
-  background: #253247;
-}
-:root[data-theme='dark'] .apply-segmented button {
-  color: var(--muted);
-}
-:root[data-theme='dark'] .apply-segmented button[aria-pressed='true'] {
-  background: #34445b;
-  color: var(--ink);
-}
-:root[data-theme='dark'] .apply-service .apply-duration input {
-  background: transparent;
-}
-:root[data-theme='dark'] .apply-duration > span {
-  color: var(--muted);
-}
-:root[data-theme='dark'] .apply-intro,
-:root[data-theme='dark'] .apply-step,
-:root[data-theme='dark'] .apply-posts span,
-:root[data-theme='dark'] .apply-brand > div > span,
-:root[data-theme='dark'] .apply-consent,
-:root[data-theme='dark'] .apply-card > p,
-:root[data-theme='dark'] .apply-card-head > div > span,
-:root[data-theme='dark'] .apply-missing,
-:root[data-theme='dark'] .apply-loading,
-:root[data-theme='dark'] .apply-remove {
-  color: var(--muted);
-}
-:root[data-theme='dark'] .apply-logo-preview {
-  background: #1a3563;
-  color: var(--blue);
-}
-:root[data-theme='dark'] .apply-cover {
-  background: #1d2838;
-  color: var(--muted);
-}
-:root[data-theme='dark'] .apply-add,
-:root[data-theme='dark'] .apply-photo-add {
-  border-color: #718199;
-}
-:root[data-theme='dark'] .apply-review > div + div,
-:root[data-theme='dark'] .apply-footer {
-  border-color: var(--line);
-}
-:root[data-theme='dark'] .apply .button-quiet {
-  background: #253247;
-  color: var(--ink);
-}
-:root[data-theme='dark'] .apply-sent {
-  background: #173d32;
-}
-:root[data-theme='dark'] .apply-sent-icon {
-  background: #1d2838;
-  color: #8bd4ab;
-}
-:root[data-theme='dark'] .apply-sent p {
-  color: #8bd4ab;
-}
-:root[data-theme='dark'] .apply-login {
-  background: #1d2838;
-}
-:root[data-theme='dark'] .apply-warning,
-:root[data-theme='dark'] .apply-status-pending {
-  background: #3d321c;
-  color: #f1cc83;
-}
-:root[data-theme='dark'] .apply-error,
-:root[data-theme='dark'] .apply-status-rejected {
-  background: #40252d;
-  color: #f0a6b3;
-}
-:root[data-theme='dark'] .apply-status-approved {
-  background: #173d32;
-  color: #8bd4ab;
-}
-:root[data-theme='dark'] .apply-danger,
-:root[data-theme='dark'] .apply-hint-error,
-:root[data-theme='dark'] .apply-reason {
-  color: #f0a6b3;
-}
+
 :root[data-theme='dark'] .preview-grid .preview-note,
 :root[data-theme='dark'] .preview-grid h3,
 :root[data-theme='dark'] .preview-grid p {
