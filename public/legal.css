@@ -148,3 +148,50 @@ body {
   font-size: 14px;
   color: var(--muted);
 }
+
+/* Страницы ошибок 404 и 50x (раньше — inline <style>, теперь здесь ради CSP). */
+.error-main {
+  min-height: calc(100dvh - 72px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.legal-main .error-code {
+  font-size: clamp(64px, 18vw, 120px);
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -4px;
+  color: var(--blue);
+  margin: 0 0 16px;
+}
+.error-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 28px 0 8px;
+}
+.error-actions a,
+.error-actions button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 12px 20px;
+  border: 0;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.error-actions .primary {
+  background: var(--blue);
+  color: #fff;
+}
+.error-actions .quiet {
+  background: #eef2f6;
+  color: var(--ink);
+}
+:root[data-theme='dark'] .error-actions .quiet {
+  background: #253247;
+}

@@ -6,6 +6,8 @@
     <meta name="robots" content="noindex" />
     <meta name="theme-color" content="#2364e4" />
     <title>Сервис временно недоступен — LanWash</title>
+    <!-- Единственный inline-скрипт сайта: в CSP страниц ошибок он разрешён по sha256
+         (deploy/nginx/lanwash.ru.conf). Меняете текст скрипта — пересчитайте хеш, см. README. -->
     <script>
       // Страницу ошибки сервер отдаёт по любому адресу. <base> ведёт ссылки и стили к корню сайта,
       // в том числе когда сайт открыт из подпапки (GitHub Pages).
@@ -20,50 +22,7 @@
     </script>
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="stylesheet" href="legal.css?v=20261114-1" />
-    <style>
-      .error-main {
-        min-height: calc(100dvh - 72px);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-      }
-      .legal-main .error-code {
-        font-size: clamp(64px, 18vw, 120px);
-        line-height: 1;
-        font-weight: 800;
-        letter-spacing: -4px;
-        color: var(--blue);
-        margin: 0 0 16px;
-      }
-      .error-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        margin: 28px 0 8px;
-      }
-      .error-actions a,
-      .error-actions button {
-        display: inline-flex;
-        align-items: center;
-        min-height: 48px;
-        padding: 12px 20px;
-        border: 0;
-        border-radius: 10px;
-        font: inherit;
-        font-size: 15px;
-        font-weight: 700;
-        text-decoration: none;
-        cursor: pointer;
-      }
-      .error-actions .primary {
-        background: var(--blue);
-        color: #fff;
-      }
-      .error-actions .quiet {
-        background: #eef2f6;
-        color: var(--ink);
-      }
-    </style>
+    <script src="legal.js?v=20261114-1"></script>
   </head>
   <body>
     <header class="legal-header">
@@ -81,7 +40,8 @@
         support@lanwash.ru.
       </p>
       <div class="error-actions">
-        <button class="primary" type="button" onclick="location.reload()">Обновить страницу</button>
+        <!-- Обработчик — в legal.js: inline onclick заблокировал бы CSP. -->
+        <button class="primary" type="button" data-reload>Обновить страницу</button>
         <a class="quiet" href="./">На главную</a>
       </div>
       <footer class="legal-footer">

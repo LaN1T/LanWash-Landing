@@ -31,6 +31,10 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
+    // «Обновить страницу» на 50x.html — без inline onclick, чтобы не ослаблять CSP.
+    for (const reload of document.querySelectorAll('[data-reload]')) {
+      reload.addEventListener('click', () => window.location.reload())
+    }
     const button = document.getElementById('legal-theme-toggle')
     if (!button) return
     button.hidden = false
