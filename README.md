@@ -222,11 +222,14 @@ python3 -c "import re,hashlib,base64;s=open('public/404.html',encoding='utf-8').
 
 - `src/App.tsx` — клиентская версия, шапка, футер, диалоги, раздел «Экраны приложения».
 - `src/BookingGuide.tsx`, `src/booking-guide.css` — шесть шагов записи.
-- `src/BusinessPage.tsx`, `src/business.css` — бизнес-версия.
-- `src/ApplyForm.tsx` — анкета подключения мойки.
+- `src/BusinessPage.tsx`, `src/business.css` — бизнес-версия (отдельный чанк, грузится только для `?audience=business`).
+- `src/ApplyForm.tsx`, `src/apply-form.css` — анкета подключения мойки (отдельный чанк, грузится при открытии анкеты, в бизнес-версии — заранее в простое).
+- `src/CookieNotice.tsx`, `src/analytics.ts` — плашка cookie и Яндекс Метрика по согласию.
+- `src/storage.ts` — доступ к `localStorage`, который не роняет сайт, если хранилище запрещено.
 - `src/DevicePhone.tsx`, `src/device-phone.css` — рамка Galaxy A17 для скриншотов.
-- `src/styles.css` — общий дизайн и адаптивная вёрстка.
+- `src/styles.css`, `src/theme.css` — общий дизайн, адаптивная вёрстка и тёмная тема.
 - `src/config.ts` — версия сайта, адрес сервера, ссылки RuStore, почта поддержки, возрастная маркировка.
-- `public/` — документы, страницы ошибок, изображения, шрифты, favicon.
+- `public/` — документы, страницы ошибок, изображения, шрифты, favicon; `theme.js` ставит тему до первой отрисовки, `legal.js` и `legal.css` — для документов и страниц ошибок.
+- `deploy/nginx/lanwash.ru.conf` — шаблон конфига nginx (см. «nginx»).
 
 Карта на скриншотах — Яндекс Карты, их логотип виден в кадре. Шрифт Manrope — [OFL](public/fonts/OFL.txt). Иконки — Lucide.
