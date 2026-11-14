@@ -172,7 +172,7 @@ python3 -m venv /tmp/fontenv && /tmp/fontenv/bin/pip install fonttools brotli
 
 ## nginx
 
-`deploy/nginx/lanwash.ru.conf` — конфиг lanwash.ru под схему сервера: HTTPS принимает Caddy и передаёт запросы nginx на `127.0.0.1:8081`, файлы сайта — в `/var/www/lanwash/current`. На сервере он ещё не применён. Что в нём:
+`deploy/nginx/lanwash.ru.conf` — конфиг lanwash.ru под схему сервера: HTTPS принимает Caddy и передаёт запросы nginx на `127.0.0.1:8081`, файлы сайта — в `/var/www/lanwash/current`. На сервере применён 14 ноября 2026: файл `/etc/nginx/sites-available/lanwash`, в `sites-enabled` — symlink на него. Что в нём:
 
 | Что                      | Значение                                                                                                                                                                            |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
