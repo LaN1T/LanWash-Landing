@@ -48,6 +48,14 @@ const BusinessPage = lazy(loadBusinessPage)
 const ApplyForm = lazy(loadApplyForm)
 if (siteConfig.audience === 'business') {
   void loadBusinessPage()
+  // Экраны из хиро бизнес-версии качаем вместе с чанком, а не после его отрисовки.
+  for (const image of ['app-business.webp', 'app-team.webp']) {
+    const link = document.createElement('link')
+    link.rel = 'preload'
+    link.as = 'image'
+    link.href = import.meta.env.BASE_URL + 'images/' + image
+    document.head.appendChild(link)
+  }
   const idle = window.requestIdleCallback ?? ((callback: () => void) => setTimeout(callback, 1500))
   idle(() => void loadApplyForm())
 }
