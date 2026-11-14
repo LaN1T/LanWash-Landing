@@ -37,12 +37,12 @@ Push в `main` запускает `.github/workflows/deploy.yml`: сначала
 
 Секреты репозитория:
 
-| Секрет | Значение |
-| --- | --- |
-| `DEPLOY_HOST` | адрес сервера |
-| `DEPLOY_USER` | SSH-пользователь с правом записи в каталог сайта |
-| `DEPLOY_PATH` | абсолютный каталог, например `/var/www/lanwash` |
-| `DEPLOY_SSH_KEY` | приватный ключ для входа |
+| Секрет               | Значение                                              |
+| -------------------- | ----------------------------------------------------- |
+| `DEPLOY_HOST`        | адрес сервера                                         |
+| `DEPLOY_USER`        | SSH-пользователь с правом записи в каталог сайта      |
+| `DEPLOY_PATH`        | абсолютный каталог, например `/var/www/lanwash`       |
+| `DEPLOY_SSH_KEY`     | приватный ключ для входа                              |
 | `DEPLOY_KNOWN_HOSTS` | результат `ssh-keyscan <сервер>` для проверки сервера |
 
 Переменная `DEPLOY_HEALTHCHECK_URL` в **Settings → Variables** необязательна; по умолчанию проверяется `https://lanwash.ru`.
@@ -154,7 +154,7 @@ root /var/www/lanwash/current;
 Пересобрать (исходный TTF — в истории git, fonttools ставится во временное окружение, не в проект):
 
 ```bash
-git show f73135d:public/fonts/manrope.ttf > /tmp/manrope.ttf
+git show 39ca207:public/fonts/manrope.ttf > /tmp/manrope.ttf
 python3 -m venv /tmp/fontenv && /tmp/fontenv/bin/pip install fonttools brotli
 /tmp/fontenv/bin/pyftsubset /tmp/manrope.ttf --flavor=woff2 --layout-features='*' \
   --name-IDs='*' --name-languages='*' --output-file=public/fonts/manrope.woff2 \
