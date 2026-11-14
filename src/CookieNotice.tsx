@@ -1,7 +1,9 @@
 import { useState } from 'react'
 
 export default function CookieNotice() {
-  const [visible, setVisible] = useState(() => localStorage.getItem('lanwash.cookie-notice') !== 'accepted')
+  const [visible, setVisible] = useState(
+    () => localStorage.getItem('lanwash.cookie-notice') !== 'accepted',
+  )
   if (!visible) return null
 
   function accept() {
@@ -13,9 +15,14 @@ export default function CookieNotice() {
     <aside className="cookie-notice" aria-label="Использование cookie">
       <div>
         <strong>Использование cookie</strong>
-        <p>Мы используем cookie, чтобы сайт работал корректно и запоминал ваши настройки. Подробнее — <a href="privacy.html">в Политике конфиденциальности</a>.</p>
+        <p>
+          Мы используем cookie, чтобы сайт работал корректно и запоминал ваши настройки. Подробнее —{' '}
+          <a href="privacy.html">в Политике конфиденциальности</a>.
+        </p>
       </div>
-      <button type="button" onClick={accept}>Понятно</button>
+      <button type="button" onClick={accept}>
+        Понятно
+      </button>
     </aside>
   )
 }

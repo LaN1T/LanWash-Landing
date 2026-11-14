@@ -6,9 +6,14 @@
     <meta name="theme-color" content="#2364e4" />
     <script>
       ;(() => {
-        const cookieTheme = document.cookie.split('; ').find((item) => item.startsWith('lanwash.theme='))?.split('=')[1]
+        const cookieTheme = document.cookie
+          .split('; ')
+          .find((item) => item.startsWith('lanwash.theme='))
+          ?.split('=')[1]
         const saved = cookieTheme || localStorage.getItem('lanwash.theme')
-        const dark = saved === 'dark' || (saved === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+        const dark =
+          saved === 'dark' ||
+          (saved === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
         document.documentElement.dataset.theme = dark ? 'dark' : 'light'
       })()
     </script>
@@ -44,7 +49,11 @@
             return
           }
         }
-        ;((k = e.createElement(t)), (a = e.getElementsByTagName(t)[0]), (k.async = 1), (k.src = r), a.parentNode.insertBefore(k, a))
+        ;((k = e.createElement(t)),
+          (a = e.getElementsByTagName(t)[0]),
+          (k.async = 1),
+          (k.src = r),
+          a.parentNode.insertBefore(k, a))
       })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=114175626', 'ym')
 
       ym(114175626, 'init', {
@@ -58,7 +67,14 @@
         trackLinks: true,
       })
     </script>
-    <noscript><div><img src="https://mc.yandex.ru/watch/114175626" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <noscript
+      ><div>
+        <img
+          src="https://mc.yandex.ru/watch/114175626"
+          style="position: absolute; left: -9999px"
+          alt=""
+        /></div
+    ></noscript>
     <!-- /Yandex.Metrika counter -->
   </body>
 </html>

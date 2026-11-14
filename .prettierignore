@@ -2,3 +2,4 @@ node_modules
 dist
 artifacts
 pnpm-lock.yaml
+public/yandex_*.html

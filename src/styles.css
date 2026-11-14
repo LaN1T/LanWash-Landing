@@ -3499,10 +3499,23 @@ svg.lucide {
   color: var(--text);
   box-shadow: 0 14px 40px #17203326;
 }
-:root[data-theme='dark'] .cookie-notice { background: #182232; }
-.cookie-notice strong { display: block; margin-bottom: 4px; font-size: 14px; }
-.cookie-notice p { color: var(--muted); font-size: 12px; line-height: 1.5; }
-.cookie-notice a { color: var(--brand); text-decoration: underline; }
+:root[data-theme='dark'] .cookie-notice {
+  background: #182232;
+}
+.cookie-notice strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+.cookie-notice p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.cookie-notice a {
+  color: var(--brand);
+  text-decoration: underline;
+}
 .cookie-notice button {
   flex-shrink: 0;
   min-height: 40px;
@@ -3515,6 +3528,13 @@ svg.lucide {
   cursor: pointer;
 }
 @media (max-width: 560px) {
-  .cookie-notice { right: 16px; bottom: 16px; gap: 12px; padding: 14px; }
-  .cookie-notice button { padding-inline: 12px; }
+  .cookie-notice {
+    right: 16px;
+    bottom: 16px;
+    gap: 12px;
+    padding: 14px;
+  }
+  .cookie-notice button {
+    padding-inline: 12px;
+  }
 }

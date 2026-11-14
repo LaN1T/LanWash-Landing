@@ -1,8 +1,13 @@
 ;(() => {
   const root = document.documentElement
-  const cookieTheme = document.cookie.split('; ').find((item) => item.startsWith('lanwash.theme='))?.split('=')[1]
+  const cookieTheme = document.cookie
+    .split('; ')
+    .find((item) => item.startsWith('lanwash.theme='))
+    ?.split('=')[1]
   const saved = cookieTheme || localStorage.getItem('lanwash.theme')
-  const dark = saved === 'dark' || (saved === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+  const dark =
+    saved === 'dark' ||
+    (saved === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
   root.dataset.theme = dark ? 'dark' : 'light'
 
   const icons = {
@@ -18,7 +23,10 @@
     const button = document.getElementById('legal-theme-toggle')
     if (button) {
       button.innerHTML = theme === 'dark' ? icons.sun : icons.moon
-      button.setAttribute('aria-label', theme === 'dark' ? 'Включить светлую тему' : 'Включить тёмную тему')
+      button.setAttribute(
+        'aria-label',
+        theme === 'dark' ? 'Включить светлую тему' : 'Включить тёмную тему',
+      )
     }
   }
 
@@ -27,6 +35,8 @@
     if (!button) return
     button.hidden = false
     setTheme(root.dataset.theme)
-    button.addEventListener('click', () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark'))
+    button.addEventListener('click', () =>
+      setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark'),
+    )
   })
 })()
