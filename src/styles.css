@@ -3488,15 +3488,15 @@ svg.lucide {
   z-index: 80;
   right: 22px;
   bottom: 22px;
-  width: min(480px, calc(100% - 32px));
+  width: min(500px, calc(100% - 32px));
   display: flex;
-  align-items: center;
-  gap: 18px;
-  padding: 16px 18px;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px 20px;
   border: 1px solid var(--line);
   border-radius: 20px;
   background: #fff;
-  color: var(--text);
+  color: var(--ink);
   box-shadow: 0 14px 40px #17203326;
 }
 :root[data-theme='dark'] .cookie-notice {
@@ -3504,28 +3504,60 @@ svg.lucide {
 }
 .cookie-notice strong {
   display: block;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
   font-size: 14px;
 }
 .cookie-notice p {
+  margin: 0;
   color: var(--muted);
   font-size: 12px;
-  line-height: 1.5;
+  line-height: 1.6;
+}
+.cookie-notice p + p {
+  margin-top: 6px;
 }
 .cookie-notice a {
-  color: var(--brand);
+  color: var(--blue);
   text-decoration: underline;
 }
-.cookie-notice button {
-  flex-shrink: 0;
+.cookie-notice .cookie-current {
+  color: var(--ink);
+  font-weight: 600;
+}
+.cookie-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.cookie-actions button {
   min-height: 40px;
-  padding: 9px 16px;
-  border: 0;
+  padding: 9px 18px;
+  border: 1px solid #2364e4;
   border-radius: 999px;
-  background: #2364e4;
-  color: #fff;
   font-weight: 700;
   cursor: pointer;
+}
+.cookie-actions .cookie-allow {
+  background: #2364e4;
+  color: #fff;
+}
+.cookie-actions .cookie-deny {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line);
+}
+.cookie-actions .cookie-deny:hover {
+  border-color: var(--muted);
+}
+.footer-bottom .footer-cookie {
+  padding: 0;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+  text-align: left;
+}
+.footer-bottom .footer-cookie:hover {
+  text-decoration: underline;
 }
 @media (max-width: 560px) {
   .cookie-notice {
@@ -3534,7 +3566,8 @@ svg.lucide {
     gap: 12px;
     padding: 14px;
   }
-  .cookie-notice button {
+  .cookie-actions button {
+    flex: 1;
     padding-inline: 12px;
   }
 }

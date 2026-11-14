@@ -1,28 +1,44 @@
-import { useState } from 'react'
+import { readChoice, saveChoice } from './analytics'
+import type { AnalyticsChoice } from './analytics'
 
-export default function CookieNotice() {
-  const [visible, setVisible] = useState(
-    () => localStorage.getItem('lanwash.cookie-notice') !== 'accepted',
-  )
-  if (!visible) return null
+const doc = (path: string) => import.meta.env.BASE_URL + path
 
-  function accept() {
-    localStorage.setItem('lanwash.cookie-notice', 'accepted')
-    setVisible(false)
+/**
+ * Плашка выбора: необходимые cookie работают всегда, Яндекс Метрика — только после «Разрешить».
+ * Появляется, пока выбора нет, и по кнопке «Настройки cookie» в футере.
+ */
+export default function CookieNotice({ onClose }: { onClose: () => void }) {
+  const current = readChoice()
+
+  function choose(value: AnalyticsChoice) {
+    saveChoice(value)
+    onClose()
   }
 
   return (
-    <aside className="cookie-notice" aria-label="Использование cookie">
+    <aside className="cookie-notice" aria-labelledby="cookie-notice-title">
       <div>
-        <strong>Использование cookie</strong>
+        <strong id="cookie-notice-title">Cookie и Яндекс Метрика</strong>
         <p>
-          Мы используем cookie, чтобы сайт работал корректно и запоминал ваши настройки. Подробнее —{' '}
-          <a href="privacy.html">в Политике конфиденциальности</a>.
+          Необходимые cookie запоминают тему и ваш выбор. Если разрешите, подключим Яндекс Метрику:
+          она считает посещения и клики, но не записывает то, что вы вводите.{' '}
+          <a href={doc('privacy.html#cookies')}>Подробнее</a> ·{' '}
+          <a href={doc('consent.html#analytics')}>текст согласия</a>
         </p>
+        {current && (
+          <p className="cookie-current">
+            Сейчас аналитика {current === 'granted' ? 'разрешена' : 'отключена'}.
+          </p>
+        )}
       </div>
-      <button type="button" onClick={accept}>
-        Понятно
-      </button>
+      <div className="cookie-actions">
+        <button type="button" className="cookie-allow" onClick={() => choose('granted')}>
+          Разрешить
+        </button>
+        <button type="button" className="cookie-deny" onClick={() => choose('denied')}>
+          Отказаться
+        </button>
+      </div>
     </aside>
   )
 }

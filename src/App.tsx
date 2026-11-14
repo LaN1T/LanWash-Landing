@@ -38,6 +38,7 @@ import BusinessPage from './BusinessPage'
 import BookingGuide from './BookingGuide'
 import DevicePhone from './DevicePhone'
 import CookieNotice from './CookieNotice'
+import { readChoice, writeStorage } from './analytics'
 
 type ModalType = 'download' | 'business' | 'preview' | 'register' | null
 type ThemeChoice = 'light' | 'dark'
@@ -339,9 +340,26 @@ export default function App() {
   const [bonusAmount, setBonusAmount] = useState(450)
   const [scrolled, setScrolled] = useState(false)
   const [theme, setTheme] = useState<ThemeChoice>(initialTheme)
+  // Плашка cookie: пока нет выбора и по «Настройки cookie» (кнопка в футере, ссылка #cookie-settings).
+  const [cookieNotice, setCookieNotice] = useState(
+    () => readChoice() === null || window.location.hash === '#cookie-settings',
+  )
+  useEffect(() => {
+    const openSettings = () => {
+      if (window.location.hash === '#cookie-settings') setCookieNotice(true)
+    }
+    window.addEventListener('hashchange', openSettings)
+    return () => window.removeEventListener('hashchange', openSettings)
+  }, [])
+  const closeCookieNotice = useCallback(() => {
+    setCookieNotice(false)
+    if (window.location.hash === '#cookie-settings') {
+      history.replaceState(null, '', window.location.pathname + window.location.search)
+    }
+  }, [])
   useEffect(() => {
     document.documentElement.dataset.theme = theme
-    localStorage.setItem('lanwash.theme', theme)
+    writeStorage('lanwash.theme', theme)
     const domain = window.location.hostname.endsWith('lanwash.ru') ? ';domain=.lanwash.ru' : ''
     document.cookie = `lanwash.theme=${theme};path=/;max-age=31536000;SameSite=Lax${domain};Secure`
   }, [theme])
@@ -390,7 +408,7 @@ export default function App() {
       <a className="skip-link" href="#main">
         К содержанию
       </a>
-      <CookieNotice />
+      {cookieNotice && <CookieNotice onClose={closeCookieNotice} />}
       <header className={'site-header' + (scrolled ? ' is-scrolled' : '')}>
         <div className="container header-inner">
           <Brand business={isBusiness} />
@@ -874,6 +892,9 @@ export default function App() {
           <span>© 2026 LanWash</span>
           <a href={asset('terms.html')}>Пользовательское соглашение</a>
           <a href={asset('privacy.html')}>Политика конфиденциальности</a>
+          <button type="button" className="footer-cookie" onClick={() => setCookieNotice(true)}>
+            Настройки cookie
+          </button>
           <span className="footer-platform">
             Android 8.0+
             <span className="age-badge" title="Возрастная маркировка">

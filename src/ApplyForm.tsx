@@ -22,6 +22,7 @@ import { siteConfig } from './config'
  * Анкета подключения мойки — те же шаги и правила, что в «LanWash Бизнес» (WashApplicationForm.kt).
  * Заявка уходит в POST /v1/wash-applications без входа. Статус сервер отдаёт по id заявки,
  * поэтому id сохраняются в этом браузере — так же приложение хранит их на телефоне.
+ * Класс ym-hide-content скрывает анкету от Вебвизора Метрики, если его когда-нибудь включат.
  */
 
 type Status = 'PENDING' | 'APPROVED' | 'REJECTED'
@@ -420,7 +421,7 @@ export default function ApplyForm({ onDirtyChange }: { onDirtyChange: (dirty: bo
 
   if (view === 'list') {
     return (
-      <div className="apply" ref={body}>
+      <div className="apply ym-hide-content" ref={body}>
         {justSent && (
           <div className="apply-sent">
             <span className="apply-sent-icon">
@@ -477,7 +478,7 @@ export default function ApplyForm({ onDirtyChange }: { onDirtyChange: (dirty: bo
   }
 
   return (
-    <div className="apply" ref={body}>
+    <div className="apply ym-hide-content" ref={body}>
       <div className="apply-progress" aria-hidden="true">
         {steps.map((title, index) => (
           <span key={title} className={index <= step ? 'active' : ''} />
