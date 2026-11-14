@@ -172,7 +172,7 @@ python3 -m venv /tmp/fontenv && /tmp/fontenv/bin/pip install fonttools brotli
 
 ## nginx
 
-`deploy/nginx/lanwash.ru.conf` — шаблон конфига lanwash.ru. На сервере он не применён. Что в нём:
+`deploy/nginx/lanwash.ru.conf` — конфиг lanwash.ru под схему сервера: HTTPS принимает Caddy и передаёт запросы nginx на `127.0.0.1:8081`, файлы сайта — в `/var/www/lanwash/current`. На сервере он ещё не применён. Что в нём:
 
 | Что                      | Значение                                                                                                                                                                            |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -199,14 +199,14 @@ python3 -c "import re,hashlib,base64;s=open('public/404.html',encoding='utf-8').
 
 Как применить на сервере:
 
-1. Сохраните текущий файл: `sudo cp /etc/nginx/sites-available/lanwash.ru ~/lanwash.ru.conf.bak`.
-2. Сравните с шаблоном. Строки `# managed by Certbot` и `root` оставьте как на сервере (при выкладке релизами — `root /var/www/lanwash/current;`). Карты `map` должны остаться вне `server { }`.
-3. Скопируйте файл, проверьте и перезагрузите: `sudo nginx -t && sudo systemctl reload nginx`.
+1. Сохраните текущий файл: `sudo cp /etc/nginx/sites-available/lanwash ~/lanwash.conf.bak`.
+2. Сравните с конфигом. Строки `# managed by Certbot` оставьте как на сервере, если пути к сертификатам другие. Карты `map` должны остаться вне `server { }`.
+3. Скопируйте файл в `/etc/nginx/sites-available/lanwash`, проверьте и перезагрузите: `sudo nginx -t && sudo systemctl reload nginx`. Сниппет `snippets/lanwash-api.conf` — из репозитория сервера (LanWash-Backend, `deploy/nginx/snippets`).
 4. Проверьте заголовки: `curl -sI https://lanwash.ru/ | grep -iE 'content-security|strict-transport|cache-control'`, `curl -sI https://lanwash.ru/assets/<файл>.js` (должно быть `immutable`), `curl -sI https://lanwash.ru/v1/…` (CSP и `Cache-Control` от nginx быть не должно).
 5. Откройте сайт, нажмите «Разрешить» в плашке cookie и проверьте в DevTools, что в консоли нет ошибок CSP, а запросы к `mc.yandex.ru` проходят.
 6. Если что-то сломалось — верните копию из шага 1 и снова `nginx -t && systemctl reload nginx`.
 
-Шаблон проверен `nginx -t` на nginx 1.22 и текущем stable (на новых версиях `listen … http2` выдаёт предупреждение — можно заменить на `http2 on;`); заголовки по всем типам адресов сверены curl’ом на тестовом контейнере.
+Конфиг проверен `nginx -t` на nginx 1.24 (как на сервере), 1.22 и текущем stable; заголовки по всем типам адресов сверены curl’ом на тестовом контейнере.
 
 ## Настройки
 
