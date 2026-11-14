@@ -34,11 +34,13 @@ import {
 } from 'lucide-react'
 import { siteConfig } from './config'
 import ApplyForm from './ApplyForm'
+import type { ApplyLoss } from './ApplyForm'
 import BusinessPage from './BusinessPage'
 import BookingGuide from './BookingGuide'
 import DevicePhone from './DevicePhone'
 import CookieNotice from './CookieNotice'
-import { readChoice, writeStorage } from './analytics'
+import { readChoice } from './analytics'
+import { writeStorage } from './storage'
 
 type ModalType = 'download' | 'business' | 'preview' | 'register' | null
 type ThemeChoice = 'light' | 'dark'
@@ -375,14 +377,14 @@ export default function App() {
   const cashback = Math.floor(cash * 0.1)
   const number = (amount: number) => new Intl.NumberFormat('ru-RU').format(amount)
   const money = (amount: number) => number(amount) + ' ₽'
-  // Анкету подключения мойки не закрываем молча, если в ней уже что-то заполнено.
-  const applyDirty = useRef(false)
-  const setApplyDirty = useCallback((dirty: boolean) => {
-    applyDirty.current = dirty
+  // Анкету подключения мойки не закрываем молча, если в ней что-то заполнено или показан пароль.
+  const applyLoss = useRef<ApplyLoss>(null)
+  const setApplyLoss = useCallback((loss: ApplyLoss) => {
+    applyLoss.current = loss
   }, [])
   const closeApply = useCallback(() => {
-    if (applyDirty.current && !window.confirm('Закрыть анкету? Заполненное не сохранится.')) return
-    applyDirty.current = false
+    if (applyLoss.current && !window.confirm(applyLoss.current)) return
+    applyLoss.current = null
     setModal(null)
   }, [])
   useEffect(() => {
@@ -960,7 +962,7 @@ export default function App() {
       )}
       {modal === 'business' && (
         <Modal key={modal} title="Подключить мойку" onClose={closeApply} className="modal-apply">
-          <ApplyForm onDirtyChange={setApplyDirty} />
+          <ApplyForm onLossChange={setApplyLoss} />
         </Modal>
       )}
       {modal === 'preview' && (

@@ -3456,6 +3456,23 @@ svg.lucide {
   font-size: 20px;
   letter-spacing: 0.5px;
   font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  /* Пароль выделяется целиком, если копирование в буфер недоступно. */
+  user-select: all;
+  overflow-wrap: anywhere;
+}
+.apply-login > p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.apply-login .apply-hint-strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+.apply-claim,
+.apply-login-done {
+  justify-self: start;
+  margin-top: 4px;
 }
 .apply-actions {
   display: flex;

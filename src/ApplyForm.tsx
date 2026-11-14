@@ -8,6 +8,7 @@ import {
   Copy,
   Download,
   ImagePlus,
+  KeyRound,
   LoaderCircle,
   Minus,
   Plus,
@@ -17,11 +18,17 @@ import {
   X,
 } from 'lucide-react'
 import { siteConfig } from './config'
+import { readStorage, writeStorage } from './storage'
 
 /*
  * Анкета подключения мойки — те же шаги и правила, что в «LanWash Бизнес» (WashApplicationForm.kt).
  * Заявка уходит в POST /v1/wash-applications без входа. Статус сервер отдаёт по id заявки,
  * поэтому id сохраняются в этом браузере — так же приложение хранит их на телефоне.
+ *
+ * Временный пароль владельца выдаётся один раз. В ответе на POST приходит claimToken — он лежит
+ * в localStorage рядом с id и удаляется, как только пароль получен или его уже нельзя получить.
+ * Сам пароль приходит из POST /v1/wash-applications/{id}/credentials и живёт только в памяти,
+ * пока открыто окно анкеты: на диск он не пишется.
  * Класс ym-hide-content скрывает анкету от Вебвизора Метрики, если его когда-нибудь включат.
  */
 
@@ -33,10 +40,15 @@ type Application = {
   phone: string
   status: Status
   rejectionReason: string
-  temporaryPassword: string
   existingOwnerId: string | null
+  // Одобрена для нового владельца, пароль ещё не выдан и не истёк.
+  credentialsReady?: boolean
   createdAt: number
 }
+// Заявка в этом браузере: id и, до выдачи пароля, одноразовый claimToken.
+type Saved = { id: string; claimToken?: string }
+type Credentials = { phone: string; temporaryPassword: string }
+type Claim = { busy?: boolean; error?: string }
 type ServiceDraft = {
   key: number
   extra: boolean
@@ -107,19 +119,32 @@ const phoneText = (digits: string) => {
 }
 const displayPhone = (phone: string) => phoneText(phoneDigits(phone)) || phone
 
-function readIds(): string[] {
+// Прежний формат — массив id; читаем и его, токена у таких заявок нет.
+function readSaved(): Saved[] {
   try {
-    const value: unknown = JSON.parse(localStorage.getItem(storageKey) || '[]')
-    return Array.isArray(value) ? value.filter((id): id is string => typeof id === 'string') : []
+    const value: unknown = JSON.parse(readStorage(storageKey) || '[]')
+    if (!Array.isArray(value)) return []
+    return value.flatMap((item: unknown): Saved[] => {
+      if (typeof item === 'string') return [{ id: item }]
+      if (!item || typeof item !== 'object') return []
+      const { id, claimToken } = item as { id?: unknown; claimToken?: unknown }
+      if (typeof id !== 'string') return []
+      return [typeof claimToken === 'string' && claimToken ? { id, claimToken } : { id }]
+    })
   } catch {
     return []
   }
 }
-function saveIds(ids: string[]) {
-  try {
-    localStorage.setItem(storageKey, JSON.stringify(ids))
-  } catch {
-    // Без хранилища статус виден до закрытия окна.
+// Без хранилища статус и токен живут до закрытия окна.
+function writeSaved(list: Saved[]) {
+  writeStorage(storageKey, JSON.stringify(list))
+}
+
+class ApiError extends Error {
+  status: number
+  constructor(message: string, status: number) {
+    super(message)
+    this.status = status
   }
 }
 
@@ -128,12 +153,13 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   try {
     response = await fetch(siteConfig.apiUrl + path, init)
   } catch {
-    throw new Error('Нет связи с сервером. Проверьте интернет и попробуйте ещё раз.')
+    throw new ApiError('Нет связи с сервером. Проверьте интернет и попробуйте ещё раз.', 0)
   }
   const body = await response.json().catch(() => null)
   if (!response.ok) {
-    throw new Error(
+    throw new ApiError(
       typeof body?.error === 'string' ? body.error : 'Сервер не принял запрос. Попробуйте ещё раз.',
+      response.status,
     )
   }
   return body as T
@@ -202,8 +228,67 @@ function Field({
   )
 }
 
-function ApplicationCard({ application }: { application: Application }) {
+function CredentialsBlock({
+  credentials,
+  onDone,
+}: {
+  credentials: Credentials
+  onDone: () => void
+}) {
   const [copied, setCopied] = useState(false)
+  return (
+    <div className="apply-login">
+      <span className="apply-label">Вход владельца в «LanWash Бизнес»</span>
+      <div className="apply-login-row">
+        <div>
+          <span>{displayPhone(credentials.phone)}</span>
+          <strong>{credentials.temporaryPassword}</strong>
+        </div>
+        <button
+          type="button"
+          className="icon-button"
+          aria-label="Скопировать временный пароль"
+          onClick={() => {
+            navigator.clipboard
+              ?.writeText(credentials.temporaryPassword)
+              .then(() => setCopied(true))
+              .catch(() => setCopied(false))
+          }}
+        >
+          {copied ? <Check size={19} /> : <Copy size={19} />}
+        </button>
+      </div>
+      <span className="apply-hint apply-hint-strong" role="status">
+        {copied ? 'Пароль скопирован. ' : ''}Пароль показывается один раз — сохраните его. После
+        первого входа смените его в профиле.
+      </span>
+      <button type="button" className="button button-quiet apply-login-done" onClick={onDone}>
+        <Check size={18} /> Пароль сохранён, скрыть
+      </button>
+    </div>
+  )
+}
+
+function ApplicationCard({
+  application,
+  hasToken,
+  claim,
+  credentials,
+  onClaim,
+  onHide,
+}: {
+  application: Application
+  hasToken: boolean
+  claim: Claim
+  credentials?: Credentials
+  onClaim: () => void
+  onHide: () => void
+}) {
+  const support = (
+    <a href={'mailto:' + siteConfig.supportEmail} className="text-link">
+      {siteConfig.supportEmail}
+    </a>
+  )
   return (
     <article className="apply-card">
       <div className="apply-card-head">
@@ -225,50 +310,73 @@ function ApplicationCard({ application }: { application: Application }) {
         <p className="apply-reason">Причина: {application.rejectionReason}</p>
       )}
       {application.status === 'APPROVED' &&
-        (application.temporaryPassword ? (
+        (credentials ? (
+          <CredentialsBlock credentials={credentials} onDone={onHide} />
+        ) : application.credentialsReady && hasToken ? (
           <div className="apply-login">
-            <span className="apply-label">Вход владельца в «LanWash Бизнес»</span>
-            <div className="apply-login-row">
-              <div>
-                <span>{displayPhone(application.phone)}</span>
-                <strong>{application.temporaryPassword}</strong>
-              </div>
-              <button
-                type="button"
-                className="icon-button"
-                aria-label="Скопировать временный пароль"
-                onClick={() => {
-                  navigator.clipboard
-                    ?.writeText(application.temporaryPassword)
-                    .then(() => setCopied(true))
-                    .catch(() => setCopied(false))
-                }}
-              >
-                {copied ? <Check size={19} /> : <Copy size={19} />}
-              </button>
-            </div>
-            <span className="apply-hint">
-              Это временный пароль — смените его в профиле после первого входа.
-            </span>
+            <p>
+              Мойка подключена. Получите временный пароль владельца — сайт покажет его один раз,
+              сохраните его сразу.
+            </p>
+            <button
+              type="button"
+              className="button button-primary apply-claim"
+              disabled={claim.busy}
+              onClick={onClaim}
+            >
+              {claim.busy ? (
+                <LoaderCircle size={18} className="apply-spin" />
+              ) : (
+                <KeyRound size={18} />
+              )}{' '}
+              Получить пароль
+            </button>
+            {claim.error && (
+              <p className="apply-error" role="alert">
+                <CircleAlert size={17} /> {claim.error}
+              </p>
+            )}
           </div>
         ) : (
-          <p>
-            Мойка подключена.{' '}
-            {application.existingOwnerId
-              ? 'Она появилась в вашей сети в «LanWash Бизнес».'
-              : 'Войдите в «LanWash Бизнес» по номеру телефона из заявки.'}
-          </p>
+          <>
+            {claim.error && (
+              <p className="apply-error" role="alert">
+                <CircleAlert size={17} /> {claim.error}
+              </p>
+            )}
+            {application.existingOwnerId ? (
+              <p>Мойка подключена и появилась в вашей сети в «LanWash Бизнес».</p>
+            ) : application.credentialsReady ? (
+              <p>
+                Мойка подключена. Временный пароль выдаётся один раз и только в браузере, из
+                которого отправлена заявка. Если доступа к нему нет, напишите на {support} —
+                администратор выдаст новый.
+              </p>
+            ) : (
+              <p>
+                Мойка подключена. Войдите в «LanWash Бизнес» по номеру телефона из заявки. Если
+                временный пароль потерян или истёк, напишите на {support} — администратор выдаст
+                новый.
+              </p>
+            )}
+          </>
         ))}
     </article>
   )
 }
 
-export default function ApplyForm({ onDirtyChange }: { onDirtyChange: (dirty: boolean) => void }) {
-  const [ids, setIds] = useState<string[]>(readIds)
-  const [view, setView] = useState<'list' | 'form'>(() => (readIds().length ? 'list' : 'form'))
+/** Что потеряется при закрытии окна: текст для подтверждения или null. */
+export type ApplyLoss = string | null
+
+export default function ApplyForm({ onLossChange }: { onLossChange: (loss: ApplyLoss) => void }) {
+  const [saved, setSaved] = useState<Saved[]>(readSaved)
+  const [view, setView] = useState<'list' | 'form'>(() => (readSaved().length ? 'list' : 'form'))
   const [applications, setApplications] = useState<Application[] | null>(null)
   const [listError, setListError] = useState<string | null>(null)
   const [justSent, setJustSent] = useState(false)
+  const [claims, setClaims] = useState<Record<string, Claim>>({})
+  // Выданные пароли — только в памяти, пока открыто окно.
+  const [credentials, setCredentials] = useState<Record<string, Credentials>>({})
 
   const [step, setStep] = useState(0)
   const [washName, setWashName] = useState('')
@@ -289,22 +397,95 @@ export default function ApplyForm({ onDirtyChange }: { onDirtyChange: (dirty: bo
   const body = useRef<HTMLDivElement>(null)
 
   const dirty = view === 'form' && (washName.trim() !== '' || address.trim() !== '')
-  useEffect(() => onDirtyChange(dirty), [dirty, onDirtyChange])
+  const passwordShown = Object.keys(credentials).length > 0
+  const loss: ApplyLoss = passwordShown
+    ? 'Закрыть окно? Временный пароль больше не покажется — проверьте, что сохранили его.'
+    : dirty
+      ? 'Закрыть анкету? Заполненное не сохранится.'
+      : null
+  useEffect(() => onLossChange(loss), [loss, onLossChange])
 
+  // Токен удаляем из хранилища, как только пароль выдан или его уже нельзя получить.
+  const forgetTokens = (drop: (id: string) => boolean) => {
+    const current = readSaved()
+    if (!current.some((item) => item.claimToken && drop(item.id))) return
+    const next = current.map((item) => (item.claimToken && drop(item.id) ? { id: item.id } : item))
+    writeSaved(next)
+    setSaved(next)
+  }
+
+  const ids = saved.map((item) => item.id)
+  const idsKey = ids.join(',')
   useEffect(() => {
-    if (view !== 'list' || !ids.length) return
+    if (view !== 'list' || !idsKey) return
     let active = true
     setListError(null)
-    request<Application[]>('/v1/wash-applications?ids=' + ids.map(encodeURIComponent).join(','))
+    request<Application[]>(
+      '/v1/wash-applications?ids=' + idsKey.split(',').map(encodeURIComponent).join(','),
+    )
       .then((list) => {
         if (!active) return
         setApplications([...list].sort((a, b) => b.createdAt - a.createdAt))
+        // Отклонена или пароль уже выдан/истёк — токен больше ни к чему.
+        const done = new Set(
+          list
+            .filter(
+              (item) =>
+                item.status === 'REJECTED' ||
+                (item.status === 'APPROVED' && !item.credentialsReady),
+            )
+            .map((item) => item.id),
+        )
+        forgetTokens((id) => done.has(id))
       })
       .catch((reason: Error) => active && setListError(reason.message))
     return () => {
       active = false
     }
-  }, [view, ids])
+  }, [view, idsKey])
+
+  async function claimPassword(id: string) {
+    const claimToken = readSaved().find((item) => item.id === id)?.claimToken
+    if (!claimToken) return
+    setClaims((all) => ({ ...all, [id]: { busy: true } }))
+    try {
+      const result = await request<Credentials>(
+        `/v1/wash-applications/${encodeURIComponent(id)}/credentials`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ claimToken }),
+        },
+      )
+      forgetTokens((item) => item === id)
+      setCredentials((all) => ({ ...all, [id]: result }))
+      setApplications(
+        (list) =>
+          list?.map((item) => (item.id === id ? { ...item, credentialsReady: false } : item)) ??
+          null,
+      )
+      setClaims((all) => ({ ...all, [id]: {} }))
+    } catch (reason) {
+      const error = reason as ApiError
+      // 410: токен неверный, пароль уже выдан или истёк срок — текст сервера показываем как есть.
+      if (error.status === 410) {
+        forgetTokens((item) => item === id)
+        setApplications(
+          (list) =>
+            list?.map((item) => (item.id === id ? { ...item, credentialsReady: false } : item)) ??
+            null,
+        )
+      }
+      setClaims((all) => ({ ...all, [id]: { error: error.message } }))
+    }
+  }
+
+  const hidePassword = (id: string) =>
+    setCredentials((all) => {
+      const next = { ...all }
+      delete next[id]
+      return next
+    })
 
   useEffect(() => {
     body.current?.scrollTo({ top: 0 })
@@ -374,31 +555,36 @@ export default function ApplyForm({ onDirtyChange }: { onDirtyChange: (dirty: bo
       const coverMediaId = cover ? await upload(cover, 'cover') : null
       const photoMediaIds: string[] = []
       for (const photo of photos) photoMediaIds.push(await upload(photo, 'application'))
-      const application = await request<Application>('/v1/wash-applications', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contactName: name.trim(),
-          phone: '+7' + phone,
-          washName: washName.trim(),
-          address: address.trim(),
-          posts,
-          services: services.map((service) => ({
-            name: service.name.trim(),
-            price: Number(service.price),
-            description: service.description.trim(),
-            extra: service.extra,
-            durationMinutes: Number(service.duration),
-          })),
-          logoMediaId,
-          coverMediaId,
-          photoMediaIds,
-          description: description.trim(),
-        }),
-      })
-      const nextIds = [application.id, ...ids.filter((id) => id !== application.id)]
-      saveIds(nextIds)
-      setIds(nextIds)
+      const created = await request<Application & { claimToken?: string }>(
+        '/v1/wash-applications',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contactName: name.trim(),
+            phone: '+7' + phone,
+            washName: washName.trim(),
+            address: address.trim(),
+            posts,
+            services: services.map((service) => ({
+              name: service.name.trim(),
+              price: Number(service.price),
+              description: service.description.trim(),
+              extra: service.extra,
+              durationMinutes: Number(service.duration),
+            })),
+            logoMediaId,
+            coverMediaId,
+            photoMediaIds,
+            description: description.trim(),
+          }),
+        },
+      )
+      const { claimToken, ...application } = created
+      const entry: Saved = claimToken ? { id: application.id, claimToken } : { id: application.id }
+      const nextSaved = [entry, ...readSaved().filter((item) => item.id !== application.id)]
+      writeSaved(nextSaved)
+      setSaved(nextSaved)
       setApplications((list) => [application, ...(list || [])])
       setJustSent(true)
       setView('list')
@@ -412,6 +598,7 @@ export default function ApplyForm({ onDirtyChange }: { onDirtyChange: (dirty: bo
       setCover(null)
       setPhotos([])
       setConsent(false)
+      setTermsAccepted(false)
     } catch (reason) {
       setError((reason as Error).message)
     } finally {
@@ -430,8 +617,8 @@ export default function ApplyForm({ onDirtyChange }: { onDirtyChange: (dirty: bo
             <div>
               <strong>Заявка отправлена</strong>
               <p>
-                Решение и данные для входа появятся здесь — откройте «Подключить мойку» снова в этом
-                браузере.
+                Решение появится здесь — откройте «Подключить мойку» снова в этом браузере. После
+                одобрения здесь же можно один раз получить временный пароль владельца.
               </p>
             </div>
           </div>
@@ -450,7 +637,15 @@ export default function ApplyForm({ onDirtyChange }: { onDirtyChange: (dirty: bo
         )}
         <div className="apply-cards">
           {applications?.map((application) => (
-            <ApplicationCard key={application.id} application={application} />
+            <ApplicationCard
+              key={application.id}
+              application={application}
+              hasToken={saved.some((item) => item.id === application.id && !!item.claimToken)}
+              claim={claims[application.id] ?? {}}
+              credentials={credentials[application.id]}
+              onClaim={() => void claimPassword(application.id)}
+              onHide={() => hidePassword(application.id)}
+            />
           ))}
         </div>
         <div className="apply-actions">
@@ -794,8 +989,8 @@ export default function ApplyForm({ onDirtyChange }: { onDirtyChange: (dirty: bo
             </Field>
           </div>
           <p className="apply-hint">
-            После одобрения будет создан аккаунт владельца: логин — указанный телефон, временный
-            пароль появится в этой заявке.
+            После одобрения будет создан аккаунт владельца: логин — указанный телефон. Временный
+            пароль можно будет один раз получить в этой заявке, в этом браузере.
           </p>
           <h4 className="apply-subtitle">Проверьте заявку</h4>
           <dl className="apply-review">

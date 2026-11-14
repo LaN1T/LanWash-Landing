@@ -7,12 +7,14 @@
  * при изменении настроек счётчика обновите эти документы.
  */
 
+import { readStorage, writeStorage } from './storage'
+
 export type AnalyticsChoice = 'granted' | 'denied'
 
 const counterId = 114175626
 const tagUrl = `https://mc.yandex.ru/metrika/tag.js?id=${counterId}`
 const choiceKey = 'lanwash.analytics-consent'
-// Старая плашка Дейва («Понятно») сообщала только о необходимых cookie — согласием на Метрику она не была.
+// Прежняя плашка («Понятно») сообщала только о необходимых cookie — согласием на Метрику она не была.
 const legacyNoticeKey = 'lanwash.cookie-notice'
 // Выбор действует 12 месяцев, затем спрашиваем снова. Столько же живёт cookie _ym_uid.
 const choiceLifetime = 365 * 24 * 60 * 60 * 1000
@@ -21,24 +23,6 @@ type Ym = ((...args: unknown[]) => void) & { a?: unknown[]; l?: number }
 declare global {
   interface Window {
     ym?: Ym
-  }
-}
-
-// Хранилище может быть недоступно (приватный режим, запрет cookie) — тогда сайт работает,
-// а Метрика просто не включается.
-export function readStorage(key: string): string | null {
-  try {
-    return localStorage.getItem(key)
-  } catch {
-    return null
-  }
-}
-export function writeStorage(key: string, value: string | null) {
-  try {
-    if (value === null) localStorage.removeItem(key)
-    else localStorage.setItem(key, value)
-  } catch {
-    // Без хранилища выбор действует до закрытия страницы.
   }
 }
 
