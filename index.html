@@ -4,14 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#2364e4" />
-    <script>
-      ;(() => {
-        const cookieTheme = document.cookie.split('; ').find((item) => item.startsWith('lanwash.theme='))?.split('=')[1]
-        const saved = cookieTheme || localStorage.getItem('lanwash.theme')
-        const dark = saved === 'dark' || (saved === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
-        document.documentElement.dataset.theme = dark ? 'dark' : 'light'
-      })()
-    </script>
+    <!-- Тема до первой отрисовки. Отдельным файлом, а не inline: так CSP обходится без 'unsafe-inline'. -->
+    <script src="theme.js" vite-ignore></script>
     <meta
       name="description"
       content="LanWash — мойки рядом, удобная запись и бонусы за каждый визит. Зарегистрируйтесь в Android-приложении LanWash."
@@ -24,41 +18,13 @@
     <meta property="og:type" content="website" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="preload" href="/fonts/manrope.ttf" as="font" type="font/ttf" crossorigin />
+    <link rel="preload" href="/fonts/manrope.woff2" as="font" type="font/woff2" crossorigin />
     <title>LanWash — чистая машина. Выгода рядом.</title>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <!-- Yandex.Metrika counter -->
-    <script type="text/javascript">
-      ;(function (m, e, t, r, i, k, a) {
-        m[i] =
-          m[i] ||
-          function () {
-            ;(m[i].a = m[i].a || []).push(arguments)
-          }
-        m[i].l = 1 * new Date()
-        for (var j = 0; j < document.scripts.length; j++) {
-          if (document.scripts[j].src === r) {
-            return
-          }
-        }
-        ;((k = e.createElement(t)), (a = e.getElementsByTagName(t)[0]), (k.async = 1), (k.src = r), a.parentNode.insertBefore(k, a))
-      })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=114175626', 'ym')
-
-      ym(114175626, 'init', {
-        ssr: true,
-        webvisor: true,
-        clickmap: true,
-        ecommerce: 'dataLayer',
-        referrer: document.referrer,
-        url: location.href,
-        accurateTrackBounce: true,
-        trackLinks: true,
-      })
-    </script>
-    <noscript><div><img src="https://mc.yandex.ru/watch/114175626" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-    <!-- /Yandex.Metrika counter -->
+    <!-- Яндекс Метрика подключается из src/analytics.ts только после согласия в cookie-плашке.
+         Пиксель <noscript> не ставим: без JavaScript согласие спросить нельзя. -->
   </body>
 </html>

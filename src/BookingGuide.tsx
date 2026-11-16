@@ -77,7 +77,7 @@ export default function BookingGuide() {
             Шесть шагов — на каждом настоящий экран приложения. Сначала зарегистрируйтесь или
             войдите в Android-приложение LanWash.
           </p>
-          <div className="booking-guide-demo">
+          <div className="booking-guide-example">
             <CheckCircle2 size={18} />
             <span>Мойки, цены и имена на экранах — примеры.</span>
           </div>
@@ -107,7 +107,11 @@ export default function BookingGuide() {
         </ol>
         <p className="booking-guide-attribution">
           Карта на скриншотах — Яндекс Карты (
-          <a href="https://yandex.ru/legal/maps_termsofuse/" target="_blank" rel="noreferrer">
+          <a
+            href="https://yandex.ru/legal/maps_termsofuse/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             условия использования
           </a>
           ).

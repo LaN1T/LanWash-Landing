@@ -456,10 +456,10 @@ export default function BusinessPage({ onApply, onDownload, clientUrl }: Busines
         </div>
       </section>
 
-      <section className="container biz-demo-section" aria-labelledby="biz-demo-title">
-        <div className="biz-demo-copy">
+      <section className="container biz-connect-section" aria-labelledby="biz-connect-title">
+        <div className="biz-connect-copy">
           <span className="eyebrow">ПОДКЛЮЧЕНИЕ</span>
-          <h2 id="biz-demo-title">
+          <h2 id="biz-connect-title">
             Подключите мойку
             <br />к LanWash.
           </h2>
@@ -469,7 +469,7 @@ export default function BusinessPage({ onApply, onDownload, clientUrl }: Busines
             бонусами.
           </p>
         </div>
-        <div className="biz-demo-actions">
+        <div className="biz-connect-actions">
           <button className="button button-white button-large" type="button" onClick={onDownload}>
             Скачать в RuStore <ArrowUpRight size={19} />
           </button>

@@ -1,9 +1,14 @@
 /* Стили страниц соглашения и политики. Без сборки: файл копируется в dist как есть. */
+/* Тот же файл и диапазон, что в src/styles.css. */
 @font-face {
   font-family: Manrope;
-  src: url('fonts/manrope.ttf') format('truetype');
+  src: url('fonts/manrope.woff2') format('woff2');
   font-weight: 200 800;
   font-display: swap;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0301, U+0304, U+0308,
+    U+0329, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2000-206F, U+20AC, U+20BD, U+2116, U+2122,
+    U+2190-2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 :root {
   --blue: #2364e4;
@@ -142,4 +147,51 @@ body {
   gap: 8px 20px;
   font-size: 14px;
   color: var(--muted);
+}
+
+/* Страницы ошибок 404 и 50x (раньше — inline <style>, теперь здесь ради CSP). */
+.error-main {
+  min-height: calc(100dvh - 72px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.legal-main .error-code {
+  font-size: clamp(64px, 18vw, 120px);
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -4px;
+  color: var(--blue);
+  margin: 0 0 16px;
+}
+.error-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 28px 0 8px;
+}
+.error-actions a,
+.error-actions button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 12px 20px;
+  border: 0;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.error-actions .primary {
+  background: var(--blue);
+  color: #fff;
+}
+.error-actions .quiet {
+  background: #eef2f6;
+  color: var(--ink);
+}
+:root[data-theme='dark'] .error-actions .quiet {
+  background: #253247;
 }

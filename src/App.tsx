@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import {
@@ -33,11 +33,32 @@ import {
   ChartNoAxesCombined,
 } from 'lucide-react'
 import { siteConfig } from './config'
-import ApplyForm from './ApplyForm'
-import BusinessPage from './BusinessPage'
+import type { ApplyLoss } from './ApplyForm'
 import BookingGuide from './BookingGuide'
 import DevicePhone from './DevicePhone'
 import CookieNotice from './CookieNotice'
+import { readChoice } from './analytics'
+import { writeStorage } from './storage'
+
+// Бизнес-страница и анкета — отдельные чанки: на клиентской версии (основная аудитория) их код
+// не грузится. Бизнес-версия начинает загрузку своей страницы сразу, анкету — в простое.
+const loadBusinessPage = () => import('./BusinessPage')
+const loadApplyForm = () => import('./ApplyForm')
+const BusinessPage = lazy(loadBusinessPage)
+const ApplyForm = lazy(loadApplyForm)
+if (siteConfig.audience === 'business') {
+  void loadBusinessPage()
+  // Экраны из хиро бизнес-версии качаем вместе с чанком, а не после его отрисовки.
+  for (const image of ['app-business.webp', 'app-team.webp']) {
+    const link = document.createElement('link')
+    link.rel = 'preload'
+    link.as = 'image'
+    link.href = import.meta.env.BASE_URL + 'images/' + image
+    document.head.appendChild(link)
+  }
+  const idle = window.requestIdleCallback ?? ((callback: () => void) => setTimeout(callback, 1500))
+  idle(() => void loadApplyForm())
+}
 
 type ModalType = 'download' | 'business' | 'preview' | 'register' | null
 type ThemeChoice = 'light' | 'dark'
@@ -296,7 +317,7 @@ function RustoreButton({ className = 'button button-primary' }: { className?: st
   const href =
     siteConfig.audience === 'business' ? siteConfig.businessRustoreUrl : siteConfig.rustoreUrl
   return (
-    <a className={className} href={href} target="_blank" rel="noreferrer">
+    <a className={className} href={href} target="_blank" rel="noopener noreferrer">
       <Download size={19} /> Скачать в RuStore <ArrowUpRight size={18} />
     </a>
   )
@@ -339,9 +360,26 @@ export default function App() {
   const [bonusAmount, setBonusAmount] = useState(450)
   const [scrolled, setScrolled] = useState(false)
   const [theme, setTheme] = useState<ThemeChoice>(initialTheme)
+  // Плашка cookie: пока нет выбора и по «Настройки cookie» (кнопка в футере, ссылка #cookie-settings).
+  const [cookieNotice, setCookieNotice] = useState(
+    () => readChoice() === null || window.location.hash === '#cookie-settings',
+  )
+  useEffect(() => {
+    const openSettings = () => {
+      if (window.location.hash === '#cookie-settings') setCookieNotice(true)
+    }
+    window.addEventListener('hashchange', openSettings)
+    return () => window.removeEventListener('hashchange', openSettings)
+  }, [])
+  const closeCookieNotice = useCallback(() => {
+    setCookieNotice(false)
+    if (window.location.hash === '#cookie-settings') {
+      history.replaceState(null, '', window.location.pathname + window.location.search)
+    }
+  }, [])
   useEffect(() => {
     document.documentElement.dataset.theme = theme
-    localStorage.setItem('lanwash.theme', theme)
+    writeStorage('lanwash.theme', theme)
     const domain = window.location.hostname.endsWith('lanwash.ru') ? ';domain=.lanwash.ru' : ''
     document.cookie = `lanwash.theme=${theme};path=/;max-age=31536000;SameSite=Lax${domain};Secure`
   }, [theme])
@@ -357,14 +395,14 @@ export default function App() {
   const cashback = Math.floor(cash * 0.1)
   const number = (amount: number) => new Intl.NumberFormat('ru-RU').format(amount)
   const money = (amount: number) => number(amount) + ' ₽'
-  // Анкету подключения мойки не закрываем молча, если в ней уже что-то заполнено.
-  const applyDirty = useRef(false)
-  const setApplyDirty = useCallback((dirty: boolean) => {
-    applyDirty.current = dirty
+  // Анкету подключения мойки не закрываем молча, если в ней что-то заполнено или показан пароль.
+  const applyLoss = useRef<ApplyLoss>(null)
+  const setApplyLoss = useCallback((loss: ApplyLoss) => {
+    applyLoss.current = loss
   }, [])
   const closeApply = useCallback(() => {
-    if (applyDirty.current && !window.confirm('Закрыть анкету? Заполненное не сохранится.')) return
-    applyDirty.current = false
+    if (applyLoss.current && !window.confirm(applyLoss.current)) return
+    applyLoss.current = null
     setModal(null)
   }, [])
   useEffect(() => {
@@ -390,7 +428,7 @@ export default function App() {
       <a className="skip-link" href="#main">
         К содержанию
       </a>
-      <CookieNotice />
+      {cookieNotice && <CookieNotice onClose={closeCookieNotice} />}
       <header className={'site-header' + (scrolled ? ' is-scrolled' : '')}>
         <div className="container header-inner">
           <Brand business={isBusiness} />
@@ -433,11 +471,13 @@ export default function App() {
         </div>
       </header>
       {isBusiness ? (
-        <BusinessPage
-          onApply={() => open('business')}
-          onDownload={() => open('download')}
-          clientUrl={siteConfig.clientUrl}
-        />
+        <Suspense fallback={<main id="main" className="page-loading" />}>
+          <BusinessPage
+            onApply={() => open('business')}
+            onDownload={() => open('download')}
+            clientUrl={siteConfig.clientUrl}
+          />
+        </Suspense>
       ) : (
         <main id="main">
           <section className="hero container" id="top">
@@ -624,7 +664,7 @@ export default function App() {
               <div className="calc-card">
                 <div className="calc-head">
                   <strong>Расчёт визита</strong>
-                  <span className="demo-label">Пример</span>
+                  <span className="example-label">Пример</span>
                 </div>
                 <div className="calc-segmented" role="group" aria-label="Услуга в примере">
                   <button aria-pressed={service === 'basic'} onClick={() => setService('basic')}>
@@ -695,7 +735,7 @@ export default function App() {
                   оплаты
                 </span>
               </div>
-              <p className="demo-calculation-note">
+              <p className="example-calculation-note">
                 Кешбэк 10% начисляется с денежной части оплаты. Это пример расчёта, не настоящая
                 запись.
               </p>
@@ -874,13 +914,20 @@ export default function App() {
           <span>© 2026 LanWash</span>
           <a href={asset('terms.html')}>Пользовательское соглашение</a>
           <a href={asset('privacy.html')}>Политика конфиденциальности</a>
+          <button type="button" className="footer-cookie" onClick={() => setCookieNotice(true)}>
+            Настройки cookie
+          </button>
           <span className="footer-platform">
             Android 8.0+
             <span className="age-badge" title="Возрастная маркировка">
               {siteConfig.ageRating}
             </span>
           </span>
-          <a href="https://yandex.ru/legal/maps_termsofuse/" target="_blank" rel="noreferrer">
+          <a
+            href="https://yandex.ru/legal/maps_termsofuse/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Карта на скриншотах © Яндекс <ArrowUpRight size={12} />
           </a>
         </div>
@@ -939,7 +986,15 @@ export default function App() {
       )}
       {modal === 'business' && (
         <Modal key={modal} title="Подключить мойку" onClose={closeApply} className="modal-apply">
-          <ApplyForm onDirtyChange={setApplyDirty} />
+          <Suspense
+            fallback={
+              <p className="apply-fallback" role="status">
+                Загружаем анкету…
+              </p>
+            }
+          >
+            <ApplyForm onLossChange={setApplyLoss} />
+          </Suspense>
         </Modal>
       )}
       {modal === 'preview' && (

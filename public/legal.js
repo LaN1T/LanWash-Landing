@@ -1,8 +1,30 @@
 ;(() => {
   const root = document.documentElement
-  const cookieTheme = document.cookie.split('; ').find((item) => item.startsWith('lanwash.theme='))?.split('=')[1]
-  const saved = cookieTheme || localStorage.getItem('lanwash.theme')
-  const dark = saved === 'dark' || (saved === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+  const cookieTheme = document.cookie
+    .split('; ')
+    .find((item) => item.startsWith('lanwash.theme='))
+    ?.split('=')[1]
+  // localStorage может быть запрещён (приватный режим, блокировка cookie) — тогда светлая тема.
+  const storage = {
+    get(key) {
+      try {
+        return localStorage.getItem(key)
+      } catch {
+        return null
+      }
+    },
+    set(key, value) {
+      try {
+        localStorage.setItem(key, value)
+      } catch {
+        // Выбор останется в cookie.
+      }
+    },
+  }
+  const saved = cookieTheme || storage.get('lanwash.theme')
+  const dark =
+    saved === 'dark' ||
+    (saved === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
   root.dataset.theme = dark ? 'dark' : 'light'
 
   const icons = {
@@ -12,21 +34,30 @@
 
   function setTheme(theme) {
     root.dataset.theme = theme
-    localStorage.setItem('lanwash.theme', theme)
+    storage.set('lanwash.theme', theme)
     const domain = window.location.hostname.endsWith('lanwash.ru') ? ';domain=.lanwash.ru' : ''
     document.cookie = `lanwash.theme=${theme};path=/;max-age=31536000;SameSite=Lax${domain};Secure`
     const button = document.getElementById('legal-theme-toggle')
     if (button) {
       button.innerHTML = theme === 'dark' ? icons.sun : icons.moon
-      button.setAttribute('aria-label', theme === 'dark' ? 'Включить светлую тему' : 'Включить тёмную тему')
+      button.setAttribute(
+        'aria-label',
+        theme === 'dark' ? 'Включить светлую тему' : 'Включить тёмную тему',
+      )
     }
   }
 
   document.addEventListener('DOMContentLoaded', () => {
+    // «Обновить страницу» на 50x.html — без inline onclick, чтобы не ослаблять CSP.
+    for (const reload of document.querySelectorAll('[data-reload]')) {
+      reload.addEventListener('click', () => window.location.reload())
+    }
     const button = document.getElementById('legal-theme-toggle')
     if (!button) return
     button.hidden = false
     setTheme(root.dataset.theme)
-    button.addEventListener('click', () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark'))
+    button.addEventListener('click', () =>
+      setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark'),
+    )
   })
 })()
